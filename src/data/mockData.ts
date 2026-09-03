@@ -1,19 +1,19 @@
 import type { Empresa, Client, Article, Pressupost, Factura } from '../types';
 
 export const empresaInicial: Empresa = {
-  nom: 'TS SERVEIS I GESTIÓ S.L.',
-  nif: 'B-67890123',
-  adreca: 'Av. Diagonal 450, Principal 2a',
-  poblacio: 'Barcelona',
-  codiPostal: '08006',
-  provincia: 'Barcelona',
-  telefon: '+34 934 123 456',
-  email: 'info@tsserveisgestio.cat',
-  web: 'www.tsserveisgestio.cat',
-  iban: 'ES66 2100 0418 4012 3456 7890',
-  banc: 'CaixaBank',
-  peuPagina: "Inscrita al Registre Mercantil de Barcelona, Volum 45210, Foli 112. D'acord amb el RGPD 2016/679, les seves dades personals són tractades amb màxima confidencialitat.",
-  logoUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="60" viewBox="0 0 160 60"><rect width="160" height="60" rx="10" fill="%231e293b"/><text x="20" y="38" font-family="system-ui, sans-serif" font-weight="900" font-size="22" fill="%2338bdf8">TS</text><text x="60" y="32" font-family="system-ui, sans-serif" font-weight="700" font-size="14" fill="%23f8fafc">SERVEIS</text><text x="60" y="46" font-family="system-ui, sans-serif" font-weight="500" font-size="11" fill="%2394a3b8">i GESTIÓ</text></svg>'
+  nom: 'TS SERVEIS',
+  nif: 'L-712345-A',
+  adreca: 'Avinguda François Mitterrand 55',
+  poblacio: 'Encamp',
+  codiPostal: 'AD200',
+  provincia: 'Andorra',
+  telefon: '+376 800 123',
+  email: 'info@tsserveis.ad',
+  web: 'www.tsserveis.ad',
+  iban: 'AD12 0001 2345 6789 0123 4567',
+  banc: 'Andbank / MoraBanc',
+  peuPagina: "TS SERVEIS — Convertim les teves idees en realitat. Avinguda François Mitterrand 55, AD200 Encamp, Andorra. D'acord amb la normativa de protecció de dades d'Andorra.",
+  logoUrl: './logo.jpg'
 };
 
 // Imatges d'exemple en Data URL SVG per garantir visualització immediata i 100% offline
