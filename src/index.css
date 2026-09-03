@@ -303,12 +303,16 @@ tr:hover td {
 .modal-content {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  max-width: 700px;
+  border-radius: 24px;
   width: 100%;
-  max-height: 90vh;
+  max-height: 94vh;
   overflow-y: auto;
   box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+}
+
+.modal-content-wide {
+  max-width: 96vw !important;
+  width: 96vw !important;
 }
 
 /* Print / PDF Styling */

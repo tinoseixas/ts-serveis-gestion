@@ -327,100 +327,124 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
       {/* Modal Formulari Factura */}
       {modalObert && (
         <div className="modal-overlay p-2 sm:p-4">
-          <div className="modal-content max-w-[96vw] xl:max-w-[1600px] w-full p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in my-auto">
-            <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
-              <h3 className="text-xl sm:text-2xl font-extrabold flex items-center gap-2 text-indigo-600">
-                <FileText className="text-indigo-500" size={26} />
-                {facturaActual.numero ? `Editar Factura (${facturaActual.numero})` : 'Nova Factura'}
-              </h3>
-              <button onClick={() => setModalObert(false)} className="btn btn-secondary btn-icon">
-                <X size={20} />
-              </button>
+          <div className="modal-content modal-content-wide max-w-[96vw] w-[96vw] p-6 sm:p-8 lg:p-10 space-y-8 animate-fade-in my-auto">
+            <div className="flex items-center justify-between border-b border-[var(--border)] pb-5">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-indigo-100 text-indigo-600">
+                  <FileText size={28} />
+                </div>
+                <div>
+                  <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                    {facturaActual.numero ? `Editar Factura (${facturaActual.numero})` : 'Nova Factura Comercial'}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">Emets una factura oficial amb impostos i condicions de cobrament.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary text-slate-600">
+                  Descartar
+                </button>
+                <button type="button" onClick={(e) => { e.preventDefault(); guardar(e as any); }} className="btn btn-primary font-extrabold px-6 bg-indigo-600 hover:bg-indigo-700">
+                  Guardar Factura
+                </button>
+                <button onClick={() => setModalObert(false)} className="btn btn-secondary btn-icon ml-2">
+                  <X size={22} />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={guardar} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[var(--bg-app)] p-5 rounded-2xl border border-[var(--border)]">
-                <div>
-                  <label>Client *</label>
-                  <select 
-                    value={facturaActual.clientId || ''}
-                    onChange={(e) => seleccioClientHandler(e.target.value)}
-                    required
-                    className="font-semibold"
-                  >
-                    <option value="">-- Selecciona Client --</option>
-                    {clients.map(c => (
-                      <option key={c.id} value={c.id}>{c.nom} ({c.cifNif})</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label>Data d'Emissió</label>
-                  <input 
-                    type="date" 
-                    value={facturaActual.data || ''} 
-                    onChange={e => setFacturaActual({ ...facturaActual, data: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label>Data de Venciment</label>
-                  <input 
-                    type="date" 
-                    value={facturaActual.dataVenciment || ''} 
-                    onChange={e => setFacturaActual({ ...facturaActual, dataVenciment: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label>Estat de Pagament</label>
-                  <select 
-                    value={facturaActual.estat || 'pendent'}
-                    onChange={e => setFacturaActual({ ...facturaActual, estat: e.target.value as EstatFactura })}
-                    className="font-bold"
-                  >
-                    <option value="pendent">Pendent de pagament</option>
-                    <option value="pagada">Pagada (Cobrada)</option>
-                    <option value="vencuda">Vencuda</option>
-                    <option value="anul.lada">Anul·lada</option>
-                  </select>
-                </div>
-                <div>
-                  <label>Forma de Pagament</label>
-                  <select 
-                    value={facturaActual.formaPagament || 'transferencia'}
-                    onChange={e => setFacturaActual({ ...facturaActual, formaPagament: e.target.value as FormaPagament })}
-                    className="font-semibold"
-                  >
-                    <option value="transferencia">Transferència Bancària</option>
-                    <option value="efectiu">Efectiu</option>
-                    <option value="domiciliacio">Domiciliació Bancària</option>
-                    <option value="targeta">Targeta de Crèdit</option>
-                  </select>
-                </div>
-                <div>
-                  <label>Retenció IRPF (%)</label>
-                  <input 
-                    type="number" 
-                    step="1"
-                    placeholder="0" 
-                    value={facturaActual.irpfPercent ?? 0}
-                    onChange={e => {
-                      const irpf = parseFloat(e.target.value) || 0;
-                      setFacturaActual(prev => ({
-                        ...prev,
-                        irpfPercent: irpf,
-                        ...calcularTotals(prev.linies || [], irpf)
-                      }));
-                    }}
-                    className="font-bold"
-                  />
+            <form onSubmit={guardar} className="space-y-8">
+              {/* Dades Principals de la Factura */}
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">1. Dades Principals de la Factura</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 uppercase">Client *</label>
+                    <select 
+                      value={facturaActual.clientId || ''}
+                      onChange={(e) => seleccioClientHandler(e.target.value)}
+                      required
+                      className="font-bold text-sm bg-white border-slate-300 text-slate-900 py-3"
+                    >
+                      <option value="">-- Selecciona Client --</option>
+                      {clients.map(c => (
+                        <option key={c.id} value={c.id}>{c.nom} ({c.cifNif || 'Sense NIF'})</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 uppercase">Data d'Emissió</label>
+                    <input 
+                      type="date" 
+                      value={facturaActual.data || ''} 
+                      onChange={e => setFacturaActual({ ...facturaActual, data: e.target.value })}
+                      className="font-semibold text-sm bg-white border-slate-300 py-3 text-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 uppercase">Data de Venciment</label>
+                    <input 
+                      type="date" 
+                      value={facturaActual.dataVenciment || ''} 
+                      onChange={e => setFacturaActual({ ...facturaActual, dataVenciment: e.target.value })}
+                      className="font-semibold text-sm bg-white border-slate-300 py-3 text-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 uppercase">Estat de Pagament</label>
+                    <select 
+                      value={facturaActual.estat || 'pendent'}
+                      onChange={e => setFacturaActual({ ...facturaActual, estat: e.target.value as EstatFactura })}
+                      className="font-extrabold text-sm bg-white border-slate-300 text-indigo-700 py-3"
+                    >
+                      <option value="pendent">⏳ Pendent de pagament</option>
+                      <option value="pagada">💰 Pagada (Cobrada)</option>
+                      <option value="vencuda">⚠️ Vencuda</option>
+                      <option value="anul.lada">🚫 Anul·lada</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 uppercase">Forma de Pagament</label>
+                    <select 
+                      value={facturaActual.formaPagament || 'transferencia'}
+                      onChange={e => setFacturaActual({ ...facturaActual, formaPagament: e.target.value as FormaPagament })}
+                      className="font-semibold text-sm bg-white border-slate-300 py-3 text-slate-900"
+                    >
+                      <option value="transferencia">🏛️ Transferència Bancària</option>
+                      <option value="efectiu">💵 Efectiu</option>
+                      <option value="domiciliacio">💳 Domiciliació Bancària</option>
+                      <option value="targeta">💳 Targeta de Crèdit</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 uppercase">Retenció IRPF (%)</label>
+                    <input 
+                      type="number" 
+                      step="1"
+                      placeholder="0" 
+                      value={facturaActual.irpfPercent ?? 0}
+                      onChange={e => {
+                        const irpf = parseFloat(e.target.value) || 0;
+                        setFacturaActual(prev => ({
+                          ...prev,
+                          irpfPercent: irpf,
+                          ...calcularTotals(prev.linies || [], irpf)
+                        }));
+                      }}
+                      className="font-extrabold text-sm bg-white border-slate-300 py-3 text-slate-900"
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* Línies de la Factura */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-xl">Conceptes de la Factura</h4>
-                  <div className="flex items-center gap-2">
+                  <div>
+                    <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">2. Línies de Treball i Productes</h4>
+                    <p className="text-sm font-extrabold text-slate-800 mt-0.5">Defineix els serveis o productes d'aquesta factura.</p>
+                  </div>
+                  <div className="flex items-center gap-3">
                     <select 
                       onChange={(e) => {
                         if (e.target.value) {
@@ -429,30 +453,30 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                           e.target.value = '';
                         }
                       }}
-                      className="text-xs font-semibold py-2 px-3 bg-slate-50 border-slate-300"
+                      className="text-xs font-bold py-2.5 px-3 bg-white border-slate-300 text-slate-800"
                     >
                       <option value="">+ Carregar des del Catàleg</option>
                       {articles.map(a => (
                         <option key={a.id} value={a.id}>{a.nom} ({formatEuro(a.preuUnitari)})</option>
                       ))}
                     </select>
-                    <button type="button" onClick={() => afegirLinia()} className="btn btn-secondary btn-sm font-bold">
+                    <button type="button" onClick={() => afegirLinia()} className="btn btn-secondary font-bold text-xs py-2.5 bg-white">
                       + Concepte Manual
                     </button>
                   </div>
                 </div>
 
-                <div className="table-container bg-white shadow-sm border border-slate-200">
-                  <table className="w-full min-w-[900px]">
+                <div className="table-container bg-white shadow-sm border border-slate-200 rounded-2xl overflow-x-auto">
+                  <table className="w-full min-w-[950px]">
                     <thead>
-                      <tr className="bg-slate-100/80 text-slate-700 text-xs font-extrabold uppercase tracking-wider">
-                        <th className="p-3.5 text-left min-w-[280px]">Concepte / Descripció de la Factura</th>
-                        <th className="p-3.5 w-40 text-center">Quantitat</th>
-                        <th className="p-3.5 w-44 text-right">Preu U. (€)</th>
-                        <th className="p-3.5 w-32 text-right">Desc. %</th>
-                        <th className="p-3.5 w-32 text-center">Tipus IVA</th>
-                        <th className="p-3.5 w-44 text-right">Subtotal</th>
-                        <th className="p-3.5 w-14 text-center"></th>
+                      <tr className="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider">
+                        <th className="p-4 text-left min-w-[320px]">Concepte / Descripció de la Factura</th>
+                        <th className="p-4 w-44 text-center">Quantitat</th>
+                        <th className="p-4 w-48 text-right">Preu Unitari (€)</th>
+                        <th className="p-4 w-32 text-right">Desc. %</th>
+                        <th className="p-4 w-32 text-center">Tipus IVA</th>
+                        <th className="p-4 w-48 text-right">Subtotal (€)</th>
+                        <th className="p-4 w-14 text-center"></th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -462,55 +486,57 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                         const subtotalLinia = base - desc;
 
                         return (
-                          <tr key={l.id} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="p-3">
-                              <input 
-                                type="text" 
-                                value={l.nom} 
-                                onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
-                                placeholder="Descripció del servei o producte"
-                                className="font-bold text-sm text-slate-900 border-slate-200 mb-1 focus:border-indigo-500"
-                              />
-                              <input 
-                                type="text" 
-                                value={l.descripcio || ''} 
-                                onChange={e => actualitzarLinia(l.id, 'descripcio', e.target.value)}
-                                placeholder="Detalls addicionals..."
-                                className="text-xs text-slate-600 border-slate-200"
-                              />
+                          <tr key={l.id} className="hover:bg-indigo-50/30 transition-colors">
+                            <td className="p-3.5">
+                              <div className="space-y-2">
+                                <input 
+                                  type="text" 
+                                  value={l.nom} 
+                                  onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
+                                  placeholder="Descripció del servei o producte"
+                                  className="font-bold text-base text-slate-900 border-slate-300 focus:border-indigo-500 py-2 px-3"
+                                />
+                                <input 
+                                  type="text" 
+                                  value={l.descripcio || ''} 
+                                  onChange={e => actualitzarLinia(l.id, 'descripcio', e.target.value)}
+                                  placeholder="Detalls addicionals..."
+                                  className="text-xs text-slate-600 border-slate-200 py-1.5 px-3"
+                                />
+                              </div>
                             </td>
-                            <td className="p-3 w-40">
+                            <td className="p-3.5 w-44">
                               <input 
                                 type="number" 
                                 step="any" 
                                 value={l.quantitat} 
                                 onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
-                                className="text-center font-extrabold text-lg py-2.5 px-3 bg-indigo-50/90 border-2 border-indigo-300 focus:border-indigo-600 focus:bg-white text-indigo-950 rounded-xl shadow-sm"
+                                className="text-center font-extrabold text-xl py-3 px-3 bg-indigo-50 border-2 border-indigo-400 focus:border-indigo-600 focus:bg-white text-indigo-950 rounded-xl shadow-inner"
                               />
                             </td>
-                            <td className="p-3 w-44">
+                            <td className="p-3.5 w-48">
                               <input 
                                 type="number" 
                                 step="0.01" 
                                 value={l.preuUnitari} 
                                 onChange={e => actualitzarLinia(l.id, 'preuUnitari', parseFloat(e.target.value) || 0)}
-                                className="text-right font-bold text-base py-2.5 px-3 border-slate-300 focus:border-indigo-500"
+                                className="text-right font-bold text-lg py-2.5 px-3 border-slate-300 focus:border-indigo-500"
                               />
                             </td>
-                            <td className="p-3 w-32">
+                            <td className="p-3.5 w-32">
                               <input 
                                 type="number" 
                                 step="1" 
                                 value={l.descomptePercent} 
                                 onChange={e => actualitzarLinia(l.id, 'descomptePercent', parseFloat(e.target.value) || 0)}
-                                className="text-right font-medium text-sm py-2 px-2 border-slate-300"
+                                className="text-right font-bold text-sm py-2.5 px-2 border-slate-300"
                               />
                             </td>
-                            <td className="p-3 w-32">
+                            <td className="p-3.5 w-32">
                               <select 
                                 value={l.ivaPercent}
                                 onChange={e => actualitzarLinia(l.id, 'ivaPercent', Number(e.target.value))}
-                                className="text-sm py-2 px-2 text-center font-bold border-slate-300"
+                                className="text-sm py-2.5 px-2 text-center font-extrabold border-slate-300"
                               >
                                 <option value={21}>21%</option>
                                 <option value={10}>10%</option>
@@ -518,17 +544,17 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                                 <option value={0}>0%</option>
                               </select>
                             </td>
-                            <td className="p-3 text-right font-extrabold text-base text-indigo-700 w-44">
+                            <td className="p-3.5 text-right font-extrabold text-lg text-indigo-700 w-48">
                               {formatEuro(subtotalLinia)}
                             </td>
-                            <td className="p-3 text-center w-14">
+                            <td className="p-3.5 text-center w-14">
                               <button 
                                 type="button" 
                                 onClick={() => eliminarLinia(l.id)}
-                                className="text-rose-400 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-colors"
+                                className="text-rose-500 hover:text-rose-700 p-2 rounded-xl hover:bg-rose-50 transition-colors"
                                 title="Eliminar línia"
                               >
-                                <X size={18} />
+                                <X size={20} />
                               </button>
                             </td>
                           </tr>
@@ -539,43 +565,45 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                 </div>
               </div>
 
-              {/* Totals de Factura */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-[var(--bg-app)] p-5 rounded-xl border border-[var(--border)]">
+              {/* Totals i Resum Final */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-6 rounded-2xl border border-slate-200">
                 <div>
-                  <label>Notes & Informació Bancària</label>
+                  <label className="text-xs font-bold text-slate-700 uppercase">Notes i Instruccions de Pagament</label>
                   <textarea 
                     rows={4} 
                     value={facturaActual.notes || ''} 
                     onChange={e => setFacturaActual({ ...facturaActual, notes: e.target.value })}
+                    placeholder="Número de compte bancari IBAN, dades de transferència..."
+                    className="bg-white border-slate-300 text-sm mt-1"
                   />
                 </div>
-                <div className="space-y-3 justify-self-end w-full max-w-xs text-sm">
-                  <div className="flex justify-between text-[var(--text-muted)]">
-                    <span>Base Imponible:</span>
-                    <span className="font-semibold text-[var(--text-main)]">{formatEuro(facturaActual.subtotal || 0)}</span>
+                <div className="space-y-3 justify-self-end w-full max-w-sm text-sm bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                  <div className="flex justify-between text-slate-600 font-medium">
+                    <span>Base Imponible Totals:</span>
+                    <span className="font-bold text-slate-900">{formatEuro(facturaActual.subtotal || 0)}</span>
                   </div>
-                  <div className="flex justify-between text-[var(--text-muted)]">
-                    <span>Quota IVA:</span>
-                    <span className="font-semibold text-[var(--text-main)]">{formatEuro(facturaActual.totalIva || 0)}</span>
+                  <div className="flex justify-between text-slate-600 font-medium">
+                    <span>Quota d'IVA Total:</span>
+                    <span className="font-bold text-slate-900">{formatEuro(facturaActual.totalIva || 0)}</span>
                   </div>
                   {(facturaActual.irpfPercent || 0) > 0 && (
-                    <div className="flex justify-between text-rose-400">
+                    <div className="flex justify-between text-rose-600 font-medium">
                       <span>Retenció IRPF (-{facturaActual.irpfPercent}%):</span>
-                      <span className="font-semibold">-{formatEuro(facturaActual.totalIrpf || 0)}</span>
+                      <span className="font-bold">-{formatEuro(facturaActual.totalIrpf || 0)}</span>
                     </div>
                   )}
-                  <div className="border-t border-[var(--border)] pt-3 flex justify-between font-extrabold text-lg">
-                    <span>TOTAL FACTURA:</span>
-                    <span className="text-indigo-400">{formatEuro(facturaActual.total || 0)}</span>
+                  <div className="border-t-2 border-slate-200 pt-3 flex justify-between font-extrabold text-xl">
+                    <span className="text-slate-900">TOTAL FACTURA:</span>
+                    <span className="text-indigo-600">{formatEuro(facturaActual.total || 0)}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
-                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary">
-                  Cancel·lar
+              <div className="flex justify-end items-center gap-4 pt-4 border-t border-slate-200">
+                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary font-bold px-6 py-3">
+                  Descartar Canvis
                 </button>
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn btn-primary font-extrabold px-8 py-3 text-base shadow-lg bg-indigo-600 hover:bg-indigo-700">
                   Guardar Factura
                 </button>
               </div>
