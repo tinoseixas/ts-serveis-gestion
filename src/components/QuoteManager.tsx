@@ -374,7 +374,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
       {/* Modal d'Edició / Creació de Pressupost Avançat per Sectors */}
       {modalObert && (
         <div className="modal-overlay">
-          <div className="modal-content max-w-5xl w-full p-6 space-y-6 animate-fade-in">
+          <div className="modal-content max-w-[1250px] w-full p-6 sm:p-8 space-y-6 animate-fade-in">
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
               <h3 className="text-xl font-bold flex items-center gap-2">
                 <FileSpreadsheet className="text-sky-400" />
@@ -458,11 +458,11 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                   const liniesSector = (pressupostActual.linies || []).filter(l => l.sectorId === sec.id);
 
                   return (
-                    <div key={sec.id} className="card p-4 space-y-4 border-2 border-indigo-500/20 bg-slate-900/40">
+                    <div key={sec.id} className="card p-4 space-y-4 border-2 border-indigo-500/20 bg-slate-900/10">
                       {/* Encapçalament del Sector */}
                       <div className="flex items-center justify-between gap-4 bg-[var(--bg-app)] p-3 rounded-lg border border-[var(--border)]">
                         <div className="flex items-center gap-2 flex-1">
-                          <span className="font-extrabold text-xs px-2.5 py-1 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                          <span className="font-extrabold text-xs px-2.5 py-1 rounded bg-indigo-500/20 text-indigo-500 border border-indigo-500/30">
                             Sector {secIdx + 1}
                           </span>
                           <input 
@@ -475,7 +475,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                 sectors: prev.sectors?.map(s => s.id === sec.id ? { ...s, nom: nomNou } : s)
                               }));
                             }}
-                            className="font-bold text-sm bg-transparent border-none focus:ring-0 text-sky-400"
+                            className="font-bold text-sm bg-transparent border-none focus:ring-0 text-sky-600"
                             placeholder="Nom del Sector (ex: Sector 1: Demolicions)"
                           />
                         </div>
@@ -489,7 +489,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                 e.target.value = '';
                               }
                             }}
-                            className="text-xs py-1"
+                            className="text-xs py-1.5"
                           >
                             <option value="">+ Afegir des del Catàleg</option>
                             {articles.map(a => (
@@ -522,15 +522,15 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                         </div>
                       ) : (
                         <div className="table-container">
-                          <table>
+                          <table className="min-w-[850px]">
                             <thead>
                               <tr>
-                                <th>Concept/Article</th>
-                                <th className="w-24">Quantitat</th>
-                                <th className="w-28">Preu U. (€)</th>
-                                <th className="w-24">Desc. %</th>
-                                <th className="w-24">IVA %</th>
-                                <th className="w-28 text-right">Subtotal</th>
+                                <th className="min-w-[220px]">Concepte / Article</th>
+                                <th className="w-36 text-center">Quantitat</th>
+                                <th className="w-40 text-right">Preu U. (€)</th>
+                                <th className="w-32 text-right">Desc. %</th>
+                                <th className="w-32 text-center">IVA %</th>
+                                <th className="w-36 text-right">Subtotal</th>
                                 <th className="w-12 text-center"></th>
                               </tr>
                             </thead>
@@ -549,7 +549,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                           value={l.nom} 
                                           onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
                                           placeholder="Nom de l'article o servei"
-                                          className="font-bold text-xs"
+                                          className="font-bold text-sm"
                                         />
                                         <textarea 
                                           rows={1}
@@ -560,38 +560,38 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                         />
                                       </div>
                                     </td>
-                                    <td>
+                                    <td className="w-36">
                                       <input 
                                         type="number" 
-                                        step="1" 
+                                        step="any" 
                                         value={l.quantitat} 
                                         onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
-                                        className="text-center text-xs"
+                                        className="text-center font-extrabold text-base py-2 px-3 bg-sky-50 border-sky-300 focus:bg-white text-slate-900 shadow-sm"
                                       />
                                     </td>
-                                    <td>
+                                    <td className="w-40">
                                       <input 
                                         type="number" 
                                         step="0.01" 
                                         value={l.preuUnitari} 
                                         onChange={e => actualitzarLinia(l.id, 'preuUnitari', parseFloat(e.target.value) || 0)}
-                                        className="text-right text-xs"
+                                        className="text-right font-bold text-sm py-2 px-3"
                                       />
                                     </td>
-                                    <td>
+                                    <td className="w-32">
                                       <input 
                                         type="number" 
                                         step="1" 
                                         value={l.descomptePercent} 
                                         onChange={e => actualitzarLinia(l.id, 'descomptePercent', parseFloat(e.target.value) || 0)}
-                                        className="text-right text-xs"
+                                        className="text-right font-medium text-sm py-2 px-3"
                                       />
                                     </td>
-                                    <td>
+                                    <td className="w-32">
                                       <select 
                                         value={l.ivaPercent}
                                         onChange={e => actualitzarLinia(l.id, 'ivaPercent', Number(e.target.value))}
-                                        className="text-xs py-1"
+                                        className="text-sm py-2 text-center font-semibold"
                                       >
                                         <option value={21}>21%</option>
                                         <option value={10}>10%</option>
@@ -599,7 +599,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                         <option value={0}>0%</option>
                                       </select>
                                     </td>
-                                    <td className="text-right font-extrabold text-xs">
+                                    <td className="text-right font-extrabold text-sm text-sky-600">
                                       {formatEuro(subtotalLinia)}
                                     </td>
                                     <td className="text-center">

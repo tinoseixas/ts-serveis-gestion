@@ -327,7 +327,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
       {/* Modal Formulari Factura */}
       {modalObert && (
         <div className="modal-overlay">
-          <div className="modal-content max-w-4xl w-full p-6 space-y-6 animate-fade-in">
+          <div className="modal-content max-w-[1250px] w-full p-6 sm:p-8 space-y-6 animate-fade-in">
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
               <h3 className="text-xl font-bold flex items-center gap-2">
                 <FileText className="text-indigo-400" />
@@ -439,15 +439,15 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                 </div>
 
                 <div className="table-container">
-                  <table>
+                  <table className="min-w-[850px]">
                     <thead>
                       <tr>
-                        <th>Concepte / Descripció</th>
-                        <th className="w-24">Quantitat</th>
-                        <th className="w-28">Preu U. (€)</th>
-                        <th className="w-24">Desc. %</th>
-                        <th className="w-24">IVA %</th>
-                        <th className="w-28 text-right">Subtotal</th>
+                        <th className="min-w-[220px]">Concepte / Descripció</th>
+                        <th className="w-36 text-center">Quantitat</th>
+                        <th className="w-40 text-right">Preu U. (€)</th>
+                        <th className="w-32 text-right">Desc. %</th>
+                        <th className="w-32 text-center">IVA %</th>
+                        <th className="w-36 text-right">Subtotal</th>
                         <th className="w-12 text-center"></th>
                       </tr>
                     </thead>
@@ -465,7 +465,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                                 value={l.nom} 
                                 onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
                                 placeholder="Descripció del servei o producte"
-                                className="font-bold text-xs mb-1"
+                                className="font-bold text-sm mb-1"
                               />
                               <input 
                                 type="text" 
@@ -475,38 +475,38 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                                 className="text-xs text-[var(--text-muted)]"
                               />
                             </td>
-                            <td>
+                            <td className="w-36">
                               <input 
                                 type="number" 
-                                step="1" 
+                                step="any" 
                                 value={l.quantitat} 
                                 onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
-                                className="text-center text-xs"
+                                className="text-center font-extrabold text-base py-2 px-3 bg-sky-50 border-sky-300 focus:bg-white text-slate-900 shadow-sm"
                               />
                             </td>
-                            <td>
+                            <td className="w-40">
                               <input 
                                 type="number" 
                                 step="0.01" 
                                 value={l.preuUnitari} 
                                 onChange={e => actualitzarLinia(l.id, 'preuUnitari', parseFloat(e.target.value) || 0)}
-                                className="text-right text-xs"
+                                className="text-right font-bold text-sm py-2 px-3"
                               />
                             </td>
-                            <td>
+                            <td className="w-32">
                               <input 
                                 type="number" 
                                 step="1" 
                                 value={l.descomptePercent} 
                                 onChange={e => actualitzarLinia(l.id, 'descomptePercent', parseFloat(e.target.value) || 0)}
-                                className="text-right text-xs"
+                                className="text-right font-medium text-sm py-2 px-3"
                               />
                             </td>
-                            <td>
+                            <td className="w-32">
                               <select 
                                 value={l.ivaPercent}
                                 onChange={e => actualitzarLinia(l.id, 'ivaPercent', Number(e.target.value))}
-                                className="text-xs py-1"
+                                className="text-sm py-2 text-center font-semibold"
                               >
                                 <option value={21}>21%</option>
                                 <option value={10}>10%</option>
@@ -514,7 +514,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                                 <option value={0}>0%</option>
                               </select>
                             </td>
-                            <td className="text-right font-extrabold text-xs">
+                            <td className="text-right font-extrabold text-sm text-indigo-600">
                               {formatEuro(subtotalLinia)}
                             </td>
                             <td className="text-center">
