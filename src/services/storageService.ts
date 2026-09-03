@@ -58,7 +58,7 @@ export const storageService = {
 
   // Tema (Fosc / Clar)
   getTheme: (): 'dark' | 'light' => {
-    return (localStorage.getItem(KEYS.THEME) as 'dark' | 'light') || 'dark';
+    return (localStorage.getItem(KEYS.THEME) as 'dark' | 'light') || 'light';
   },
   saveTheme: (theme: 'dark' | 'light'): void => {
     localStorage.setItem(KEYS.THEME, theme);

@@ -48,8 +48,8 @@ export const ClientManager: React.FC<ClientManagerProps> = ({
 
   const guardar = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!clientActual.nom || !clientActual.cifNif) {
-      alert('Si us plau, omple el Nom i el CIF/NIF.');
+    if (!clientActual.nom || clientActual.nom.trim() === '') {
+      alert('Si us plau, indica el Nom o Raó Social del client.');
       return;
     }
     onSaveClient(clientActual as Client);
@@ -180,10 +180,9 @@ export const ClientManager: React.FC<ClientManagerProps> = ({
                   />
                 </div>
                 <div>
-                  <label>CIF / NIF / DNI *</label>
+                  <label>CIF / NIF / DNI (opcional)</label>
                   <input 
                     type="text" 
-                    required 
                     placeholder="Ex: B-65432109" 
                     value={clientActual.cifNif || ''} 
                     onChange={e => setClientActual({ ...clientActual, cifNif: e.target.value })}
