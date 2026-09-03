@@ -326,26 +326,27 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
 
       {/* Modal Formulari Factura */}
       {modalObert && (
-        <div className="modal-overlay">
-          <div className="modal-content max-w-[1250px] w-full p-6 sm:p-8 space-y-6 animate-fade-in">
+        <div className="modal-overlay p-2 sm:p-4">
+          <div className="modal-content max-w-[96vw] xl:max-w-[1600px] w-full p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in my-auto">
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
-              <h3 className="text-xl font-bold flex items-center gap-2">
-                <FileText className="text-indigo-400" />
+              <h3 className="text-xl sm:text-2xl font-extrabold flex items-center gap-2 text-indigo-600">
+                <FileText className="text-indigo-500" size={26} />
                 {facturaActual.numero ? `Editar Factura (${facturaActual.numero})` : 'Nova Factura'}
               </h3>
               <button onClick={() => setModalObert(false)} className="btn btn-secondary btn-icon">
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
             <form onSubmit={guardar} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[var(--bg-app)] p-4 rounded-xl border border-[var(--border)]">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[var(--bg-app)] p-5 rounded-2xl border border-[var(--border)]">
                 <div>
                   <label>Client *</label>
                   <select 
                     value={facturaActual.clientId || ''}
                     onChange={(e) => seleccioClientHandler(e.target.value)}
                     required
+                    className="font-semibold"
                   >
                     <option value="">-- Selecciona Client --</option>
                     {clients.map(c => (
@@ -374,6 +375,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                   <select 
                     value={facturaActual.estat || 'pendent'}
                     onChange={e => setFacturaActual({ ...facturaActual, estat: e.target.value as EstatFactura })}
+                    className="font-bold"
                   >
                     <option value="pendent">Pendent de pagament</option>
                     <option value="pagada">Pagada (Cobrada)</option>
@@ -386,6 +388,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                   <select 
                     value={facturaActual.formaPagament || 'transferencia'}
                     onChange={e => setFacturaActual({ ...facturaActual, formaPagament: e.target.value as FormaPagament })}
+                    className="font-semibold"
                   >
                     <option value="transferencia">Transferència Bancària</option>
                     <option value="efectiu">Efectiu</option>
@@ -408,6 +411,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                         ...calcularTotals(prev.linies || [], irpf)
                       }));
                     }}
+                    className="font-bold"
                   />
                 </div>
               </div>
@@ -415,7 +419,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
               {/* Línies de la Factura */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-base">Conceptes de la Factura</h4>
+                  <h4 className="font-extrabold text-xl">Conceptes de la Factura</h4>
                   <div className="flex items-center gap-2">
                     <select 
                       onChange={(e) => {
@@ -425,88 +429,88 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                           e.target.value = '';
                         }
                       }}
-                      className="text-xs py-1"
+                      className="text-xs font-semibold py-2 px-3 bg-slate-50 border-slate-300"
                     >
                       <option value="">+ Carregar des del Catàleg</option>
                       {articles.map(a => (
                         <option key={a.id} value={a.id}>{a.nom} ({formatEuro(a.preuUnitari)})</option>
                       ))}
                     </select>
-                    <button type="button" onClick={() => afegirLinia()} className="btn btn-secondary btn-sm">
+                    <button type="button" onClick={() => afegirLinia()} className="btn btn-secondary btn-sm font-bold">
                       + Concepte Manual
                     </button>
                   </div>
                 </div>
 
-                <div className="table-container">
-                  <table className="min-w-[850px]">
+                <div className="table-container bg-white shadow-sm border border-slate-200">
+                  <table className="w-full min-w-[900px]">
                     <thead>
-                      <tr>
-                        <th className="min-w-[220px]">Concepte / Descripció</th>
-                        <th className="w-36 text-center">Quantitat</th>
-                        <th className="w-40 text-right">Preu U. (€)</th>
-                        <th className="w-32 text-right">Desc. %</th>
-                        <th className="w-32 text-center">IVA %</th>
-                        <th className="w-36 text-right">Subtotal</th>
-                        <th className="w-12 text-center"></th>
+                      <tr className="bg-slate-100/80 text-slate-700 text-xs font-extrabold uppercase tracking-wider">
+                        <th className="p-3.5 text-left min-w-[280px]">Concepte / Descripció de la Factura</th>
+                        <th className="p-3.5 w-40 text-center">Quantitat</th>
+                        <th className="p-3.5 w-44 text-right">Preu U. (€)</th>
+                        <th className="p-3.5 w-32 text-right">Desc. %</th>
+                        <th className="p-3.5 w-32 text-center">Tipus IVA</th>
+                        <th className="p-3.5 w-44 text-right">Subtotal</th>
+                        <th className="p-3.5 w-14 text-center"></th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-slate-100">
                       {(facturaActual.linies || []).map((l) => {
                         const base = l.preuUnitari * l.quantitat;
                         const desc = (base * (l.descomptePercent || 0)) / 100;
                         const subtotalLinia = base - desc;
 
                         return (
-                          <tr key={l.id}>
-                            <td>
+                          <tr key={l.id} className="hover:bg-slate-50/80 transition-colors">
+                            <td className="p-3">
                               <input 
                                 type="text" 
                                 value={l.nom} 
                                 onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
                                 placeholder="Descripció del servei o producte"
-                                className="font-bold text-sm mb-1"
+                                className="font-bold text-sm text-slate-900 border-slate-200 mb-1 focus:border-indigo-500"
                               />
                               <input 
                                 type="text" 
                                 value={l.descripcio || ''} 
                                 onChange={e => actualitzarLinia(l.id, 'descripcio', e.target.value)}
                                 placeholder="Detalls addicionals..."
-                                className="text-xs text-[var(--text-muted)]"
+                                className="text-xs text-slate-600 border-slate-200"
                               />
                             </td>
-                            <td className="w-36">
+                            <td className="p-3 w-40">
                               <input 
                                 type="number" 
                                 step="any" 
                                 value={l.quantitat} 
                                 onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
-                                className="text-center font-extrabold text-base py-2 px-3 bg-sky-50 border-sky-300 focus:bg-white text-slate-900 shadow-sm"
+                                className="text-center font-extrabold text-lg py-2.5 px-3 bg-indigo-50/90 border-2 border-indigo-300 focus:border-indigo-600 focus:bg-white text-indigo-950 rounded-xl shadow-sm"
                               />
                             </td>
-                            <td className="w-40">
+                            <td className="p-3 w-44">
                               <input 
                                 type="number" 
                                 step="0.01" 
                                 value={l.preuUnitari} 
                                 onChange={e => actualitzarLinia(l.id, 'preuUnitari', parseFloat(e.target.value) || 0)}
-                                className="text-right font-bold text-sm py-2 px-3"
+                                className="text-right font-bold text-base py-2.5 px-3 border-slate-300 focus:border-indigo-500"
                               />
                             </td>
-                            <td className="w-32">
+                            <td className="p-3 w-32">
                               <input 
                                 type="number" 
                                 step="1" 
                                 value={l.descomptePercent} 
                                 onChange={e => actualitzarLinia(l.id, 'descomptePercent', parseFloat(e.target.value) || 0)}
-                                className="text-right font-medium text-sm py-2 px-3"
+                                className="text-right font-medium text-sm py-2 px-2 border-slate-300"
                               />
                             </td>
-                            <td className="w-32">
+                            <td className="p-3 w-32">
                               <select 
                                 value={l.ivaPercent}
                                 onChange={e => actualitzarLinia(l.id, 'ivaPercent', Number(e.target.value))}
-                                className="text-sm py-2 text-center font-semibold"
+                                className="text-sm py-2 px-2 text-center font-bold border-slate-300"
                               >
                                 <option value={21}>21%</option>
                                 <option value={10}>10%</option>
@@ -514,16 +518,17 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                                 <option value={0}>0%</option>
                               </select>
                             </td>
-                            <td className="text-right font-extrabold text-sm text-indigo-600">
+                            <td className="p-3 text-right font-extrabold text-base text-indigo-700 w-44">
                               {formatEuro(subtotalLinia)}
                             </td>
-                            <td className="text-center">
+                            <td className="p-3 text-center w-14">
                               <button 
                                 type="button" 
                                 onClick={() => eliminarLinia(l.id)}
-                                className="text-rose-400 hover:text-rose-600 p-1"
+                                className="text-rose-400 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-colors"
+                                title="Eliminar línia"
                               >
-                                <X size={16} />
+                                <X size={18} />
                               </button>
                             </td>
                           </tr>

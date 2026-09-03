@@ -373,27 +373,28 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
 
       {/* Modal d'Edició / Creació de Pressupost Avançat per Sectors */}
       {modalObert && (
-        <div className="modal-overlay">
-          <div className="modal-content max-w-[1250px] w-full p-6 sm:p-8 space-y-6 animate-fade-in">
+        <div className="modal-overlay p-2 sm:p-4">
+          <div className="modal-content max-w-[96vw] xl:max-w-[1600px] w-full p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in my-auto">
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
-              <h3 className="text-xl font-bold flex items-center gap-2">
-                <FileSpreadsheet className="text-sky-400" />
+              <h3 className="text-xl sm:text-2xl font-extrabold flex items-center gap-2 text-sky-600">
+                <FileSpreadsheet className="text-sky-500" size={26} />
                 {pressupostActual.numero ? `Editor de Pressupost (${pressupostActual.numero})` : 'Nou Pressupost'}
               </h3>
               <button onClick={() => setModalObert(false)} className="btn btn-secondary btn-icon">
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
             <form onSubmit={guardar} className="space-y-6">
               {/* Dades Principals del Document */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[var(--bg-app)] p-4 rounded-xl border border-[var(--border)]">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-[var(--bg-app)] p-5 rounded-2xl border border-[var(--border)]">
+                <div className="md:col-span-1">
                   <label>Client *</label>
                   <select 
                     value={pressupostActual.clientId || ''}
                     onChange={(e) => seleccioClientHandler(e.target.value)}
                     required
+                    className="font-semibold"
                   >
                     <option value="">-- Selecciona Client --</option>
                     {clients.map(c => (
@@ -422,6 +423,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                   <select 
                     value={pressupostActual.estat || 'esborrany'}
                     onChange={e => setPressupostActual({ ...pressupostActual, estat: e.target.value as EstatPressupost })}
+                    className="font-bold"
                   >
                     <option value="esborrany">Esborrany</option>
                     <option value="enviat">Enviat al client</option>
@@ -429,7 +431,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                     <option value="rebutjat">Rebutjat</option>
                   </select>
                 </div>
-                <div className="md:col-span-2 flex items-center gap-3 pt-4">
+                <div className="md:col-span-4 flex items-center gap-3 pt-2">
                   <input 
                     type="checkbox" 
                     id="incloureImatges" 
@@ -437,7 +439,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                     onChange={e => setPressupostActual({ ...pressupostActual, incloureImatgesPDF: e.target.checked })}
                     className="w-5 h-5 accent-sky-500 cursor-pointer"
                   />
-                  <label htmlFor="incloureImatges" className="cursor-pointer text-sm font-semibold capitalize text-[var(--text-main)] mb-0">
+                  <label htmlFor="incloureImatges" className="cursor-pointer text-sm font-semibold text-[var(--text-main)] mb-0">
                     Incloure imatges dels articles en el PDF generat
                   </label>
                 </div>
@@ -446,11 +448,11 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
               {/* SECTORS I ARTICLES */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-lg flex items-center gap-2">
-                    <Layers className="text-indigo-400" /> Sectors i Línies de Treball
+                  <h4 className="font-extrabold text-xl flex items-center gap-2">
+                    <Layers className="text-indigo-500" /> Sectors i Línies de Treball
                   </h4>
-                  <button type="button" onClick={afegirSector} className="btn btn-secondary btn-sm">
-                    <FolderPlus size={16} /> Afegir Nou Sector
+                  <button type="button" onClick={afegirSector} className="btn btn-secondary">
+                    <FolderPlus size={18} /> Afegir Nou Sector
                   </button>
                 </div>
 
@@ -458,11 +460,11 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                   const liniesSector = (pressupostActual.linies || []).filter(l => l.sectorId === sec.id);
 
                   return (
-                    <div key={sec.id} className="card p-4 space-y-4 border-2 border-indigo-500/20 bg-slate-900/10">
+                    <div key={sec.id} className="card p-5 space-y-5 border-2 border-indigo-500/20 bg-slate-50/50">
                       {/* Encapçalament del Sector */}
-                      <div className="flex items-center justify-between gap-4 bg-[var(--bg-app)] p-3 rounded-lg border border-[var(--border)]">
-                        <div className="flex items-center gap-2 flex-1">
-                          <span className="font-extrabold text-xs px-2.5 py-1 rounded bg-indigo-500/20 text-indigo-500 border border-indigo-500/30">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-[var(--border)] shadow-sm">
+                        <div className="flex items-center gap-3 flex-1 w-full sm:w-auto">
+                          <span className="font-extrabold text-xs px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200 uppercase tracking-wider shrink-0">
                             Sector {secIdx + 1}
                           </span>
                           <input 
@@ -475,11 +477,11 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                 sectors: prev.sectors?.map(s => s.id === sec.id ? { ...s, nom: nomNou } : s)
                               }));
                             }}
-                            className="font-bold text-sm bg-transparent border-none focus:ring-0 text-sky-600"
+                            className="font-extrabold text-base bg-transparent border-none focus:ring-0 text-sky-700 w-full"
                             placeholder="Nom del Sector (ex: Sector 1: Demolicions)"
                           />
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
                           {/* Seleccionador d'articles ràpid */}
                           <select 
                             onChange={(e) => {
@@ -489,7 +491,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                 e.target.value = '';
                               }
                             }}
-                            className="text-xs py-1.5"
+                            className="text-xs font-semibold py-2 px-3 bg-slate-50 border-slate-300"
                           >
                             <option value="">+ Afegir des del Catàleg</option>
                             {articles.map(a => (
@@ -499,7 +501,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                           <button 
                             type="button" 
                             onClick={() => afegirLiniaASector(sec.id)}
-                            className="btn btn-secondary btn-sm text-xs"
+                            className="btn btn-secondary btn-sm text-xs font-bold"
                             title="Afegir línia manual"
                           >
                             + Línia Personalitzada
@@ -507,7 +509,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                           <button 
                             type="button" 
                             onClick={() => eliminarSector(sec.id)}
-                            className="btn btn-secondary btn-icon btn-sm text-rose-400 hover:bg-rose-500/10"
+                            className="btn btn-secondary btn-icon btn-sm text-rose-500 hover:bg-rose-50 border-rose-200"
                             title="Eliminar sector"
                           >
                             <Trash2 size={16} />
@@ -517,81 +519,81 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
 
                       {/* Taula d'articles d'aquest sector */}
                       {liniesSector.length === 0 ? (
-                        <div className="text-center py-6 text-xs text-[var(--text-muted)] italic border border-dashed border-[var(--border)] rounded-lg">
+                        <div className="text-center py-8 text-sm text-[var(--text-muted)] italic border-2 border-dashed border-slate-200 rounded-xl bg-white">
                           Cap article afegit a aquest sector. Fes clic a "+ Afegir des del Catàleg" o "+ Línia Personalitzada".
                         </div>
                       ) : (
-                        <div className="table-container">
-                          <table className="min-w-[850px]">
+                        <div className="table-container bg-white shadow-sm border border-slate-200">
+                          <table className="w-full min-w-[900px]">
                             <thead>
-                              <tr>
-                                <th className="min-w-[220px]">Concepte / Article</th>
-                                <th className="w-36 text-center">Quantitat</th>
-                                <th className="w-40 text-right">Preu U. (€)</th>
-                                <th className="w-32 text-right">Desc. %</th>
-                                <th className="w-32 text-center">IVA %</th>
-                                <th className="w-36 text-right">Subtotal</th>
-                                <th className="w-12 text-center"></th>
+                              <tr className="bg-slate-100/80 text-slate-700 text-xs font-extrabold uppercase tracking-wider">
+                                <th className="p-3.5 text-left min-w-[280px]">Concepte / Descripció de l'Article</th>
+                                <th className="p-3.5 w-40 text-center">Quantitat</th>
+                                <th className="p-3.5 w-44 text-right">Preu U. (€)</th>
+                                <th className="p-3.5 w-32 text-right">Desc. %</th>
+                                <th className="p-3.5 w-32 text-center">Tipus IVA</th>
+                                <th className="p-3.5 w-44 text-right">Subtotal</th>
+                                <th className="p-3.5 w-14 text-center"></th>
                               </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-slate-100">
                               {liniesSector.map((l) => {
                                 const base = l.preuUnitari * l.quantitat;
                                 const desc = (base * (l.descomptePercent || 0)) / 100;
                                 const subtotalLinia = base - desc;
 
                                 return (
-                                  <tr key={l.id}>
-                                    <td>
-                                      <div className="space-y-1">
+                                  <tr key={l.id} className="hover:bg-slate-50/80 transition-colors">
+                                    <td className="p-3">
+                                      <div className="space-y-1.5">
                                         <input 
                                           type="text" 
                                           value={l.nom} 
                                           onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
                                           placeholder="Nom de l'article o servei"
-                                          className="font-bold text-sm"
+                                          className="font-bold text-sm text-slate-900 border-slate-200 focus:border-sky-500"
                                         />
                                         <textarea 
-                                          rows={1}
+                                          rows={2}
                                           value={l.descripcio || ''} 
                                           onChange={e => actualitzarLinia(l.id, 'descripcio', e.target.value)}
                                           placeholder="Descripció tècnica..."
-                                          className="text-xs text-[var(--text-muted)]"
+                                          className="text-xs text-slate-600 border-slate-200"
                                         />
                                       </div>
                                     </td>
-                                    <td className="w-36">
+                                    <td className="p-3 w-40">
                                       <input 
                                         type="number" 
                                         step="any" 
                                         value={l.quantitat} 
                                         onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
-                                        className="text-center font-extrabold text-base py-2 px-3 bg-sky-50 border-sky-300 focus:bg-white text-slate-900 shadow-sm"
+                                        className="text-center font-extrabold text-lg py-2.5 px-3 bg-sky-50/90 border-2 border-sky-300 focus:border-sky-600 focus:bg-white text-sky-950 rounded-xl shadow-sm"
                                       />
                                     </td>
-                                    <td className="w-40">
+                                    <td className="p-3 w-44">
                                       <input 
                                         type="number" 
                                         step="0.01" 
                                         value={l.preuUnitari} 
                                         onChange={e => actualitzarLinia(l.id, 'preuUnitari', parseFloat(e.target.value) || 0)}
-                                        className="text-right font-bold text-sm py-2 px-3"
+                                        className="text-right font-bold text-base py-2.5 px-3 border-slate-300 focus:border-sky-500"
                                       />
                                     </td>
-                                    <td className="w-32">
+                                    <td className="p-3 w-32">
                                       <input 
                                         type="number" 
                                         step="1" 
                                         value={l.descomptePercent} 
                                         onChange={e => actualitzarLinia(l.id, 'descomptePercent', parseFloat(e.target.value) || 0)}
-                                        className="text-right font-medium text-sm py-2 px-3"
+                                        className="text-right font-medium text-sm py-2 px-2 border-slate-300"
                                       />
                                     </td>
-                                    <td className="w-32">
+                                    <td className="p-3 w-32">
                                       <select 
                                         value={l.ivaPercent}
                                         onChange={e => actualitzarLinia(l.id, 'ivaPercent', Number(e.target.value))}
-                                        className="text-sm py-2 text-center font-semibold"
+                                        className="text-sm py-2 px-2 text-center font-bold border-slate-300"
                                       >
                                         <option value={21}>21%</option>
                                         <option value={10}>10%</option>
@@ -599,16 +601,17 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                         <option value={0}>0%</option>
                                       </select>
                                     </td>
-                                    <td className="text-right font-extrabold text-sm text-sky-600">
+                                    <td className="p-3 text-right font-extrabold text-base text-sky-700 w-44">
                                       {formatEuro(subtotalLinia)}
                                     </td>
-                                    <td className="text-center">
+                                    <td className="p-3 text-center w-14">
                                       <button 
                                         type="button" 
                                         onClick={() => eliminarLinia(l.id)}
-                                        className="text-rose-400 hover:text-rose-600 p-1"
+                                        className="text-rose-400 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-colors"
+                                        title="Eliminar línia"
                                       >
-                                        <X size={16} />
+                                        <X size={18} />
                                       </button>
                                     </td>
                                   </tr>
