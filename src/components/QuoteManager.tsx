@@ -612,113 +612,123 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                         </div>
                       </div>
 
-                      {/* Llista organitzada d'articles d'aquest sector */}
+                      {/* Llista organitzada d'articles d'aquest sector en UNA SOLA LÍNIA */}
                       {liniesSector.length === 0 ? (
                         <div className="text-center py-8 text-sm text-slate-500 italic border-2 border-dashed border-slate-200 rounded-xl bg-white">
                           Cap article afegit a aquest sector. Fes clic a "+ Carregar des del Catàleg" o "+ Línia Personalitzada".
                         </div>
                       ) : (
-                        <div className="space-y-4">
+                        <div className="space-y-3 overflow-x-auto pb-2">
+                          {/* Capçalera de Columnes per a Línies */}
+                          <div className="flex items-center gap-3 px-4 py-2.5 bg-white/80 rounded-xl border border-slate-200 text-xs font-black uppercase text-slate-600 tracking-wider min-w-[1050px] shadow-sm">
+                            <div className="w-[220px] shrink-0">Codi / Concepte</div>
+                            <div className="flex-1 min-w-[260px]">Descripció Tècnica</div>
+                            <div className="w-28 text-center shrink-0">Quantitat</div>
+                            <div className="w-36 text-right shrink-0">Preu U. (€)</div>
+                            <div className="w-24 text-right shrink-0">Desc. %</div>
+                            <div className="w-24 text-center shrink-0">Tipus IVA</div>
+                            <div className="w-36 text-right shrink-0">Subtotal (€)</div>
+                            <div className="w-10 text-center shrink-0"></div>
+                          </div>
+
+                          {/* Línies en una sola línia horitzontal */}
                           {liniesSector.map((l, indexLinia) => {
                             const base = l.preuUnitari * l.quantitat;
                             const desc = (base * (l.descomptePercent || 0)) / 100;
                             const subtotalLinia = base - desc;
 
                             return (
-                              <div key={l.id} className={`p-5 rounded-2xl border-2 border-slate-200 bg-white space-y-4 shadow-sm ${theme.hoverBorder} transition-all`}>
-                                {/* Fila 1: Nom de l'Article / Servei i Accions */}
-                                <div className="flex items-start gap-4">
-                                  <div className="flex-1 space-y-1.5">
-                                    <div className="flex items-center gap-2">
-                                      <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded ${theme.tagBg} uppercase shadow-sm`}>
-                                        S{secIdx + 1} · Línia #{indexLinia + 1}
-                                      </span>
-                                      <label className="text-xs font-extrabold uppercase text-slate-700 tracking-wider">Concepte / Nom de l'Article o Servei *</label>
-                                    </div>
-                                    <input 
-                                      type="text" 
-                                      value={l.nom} 
-                                      onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
-                                      placeholder="Ex: Treballs de Demolió, Instal·lació de Paviment, Pintura..."
-                                      className="font-extrabold text-base sm:text-lg text-slate-900 border-slate-300 focus:border-sky-500 py-3 px-4 rounded-xl w-full"
-                                    />
-                                  </div>
-                                  <button 
-                                    type="button" 
-                                    onClick={() => eliminarLinia(l.id)}
-                                    className="text-rose-500 hover:text-rose-700 p-3 rounded-xl hover:bg-rose-50 border border-slate-200 hover:border-rose-300 transition-colors mt-7 shrink-0"
-                                    title="Eliminar aquesta línia"
-                                  >
-                                    <Trash2 size={20} />
-                                  </button>
-                                </div>
-
-                                {/* Fila 2: Descripció Tècnica Detallada (Super Ampla) */}
-                                <div className="space-y-1.5">
-                                  <label className="text-xs font-bold text-slate-600 uppercase">Descripció Tècnica i Detalls de la Línia (Opcional)</label>
-                                  <textarea 
-                                    rows={2}
-                                    value={l.descripcio || ''} 
-                                    onChange={e => actualitzarLinia(l.id, 'descripcio', e.target.value)}
-                                    placeholder="Introdueix detalls tècnics, materials, mides o especificacions del treball..."
-                                    className="text-sm text-slate-800 border-slate-300 focus:border-sky-500 py-2.5 px-4 rounded-xl w-full bg-slate-50/50"
+                              <div key={l.id} className={`flex items-center gap-3 p-3 rounded-2xl border-2 border-slate-200 bg-white shadow-sm ${theme.hoverBorder} transition-all min-w-[1050px]`}>
+                                {/* 1. Codi / Nom de l'Article */}
+                                <div className="w-[220px] shrink-0">
+                                  <input 
+                                    type="text" 
+                                    value={l.nom} 
+                                    onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
+                                    placeholder="Nom / Codi..."
+                                    className="font-extrabold text-sm text-slate-900 border-slate-300 focus:border-sky-500 py-2.5 px-3 rounded-xl w-full"
+                                    title={`Línia #${indexLinia + 1} - Codi/Nom`}
                                   />
                                 </div>
 
-                                {/* Fila 3: Reixeta Ampla de Preus, Quantitats, Descomptes i Subtotal */}
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 pt-3 border-t border-slate-100 items-end">
-                                  <div>
-                                    <label className="text-xs font-extrabold uppercase text-slate-700">Quantitat</label>
-                                    <input 
-                                      type="number" 
-                                      step="any" 
-                                      value={l.quantitat} 
-                                      onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
-                                      className={`text-center font-black text-xl py-3 px-3 ${theme.qtyBg} border-2 focus:bg-white rounded-xl shadow-inner w-full mt-1`}
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <label className="text-xs font-extrabold uppercase text-slate-700">Preu Unitari (€)</label>
-                                    <input 
-                                      type="number" 
-                                      step="0.01" 
-                                      value={l.preuUnitari} 
-                                      onChange={e => actualitzarLinia(l.id, 'preuUnitari', parseFloat(e.target.value) || 0)}
-                                      className="text-right font-extrabold text-lg py-3 px-3 border-2 border-slate-300 focus:border-sky-500 rounded-xl w-full mt-1 text-slate-900"
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <label className="text-xs font-bold uppercase text-slate-700">Descompte (%)</label>
-                                    <input 
-                                      type="number" 
-                                      step="1" 
-                                      value={l.descomptePercent} 
-                                      onChange={e => actualitzarLinia(l.id, 'descomptePercent', parseFloat(e.target.value) || 0)}
-                                      className="text-right font-bold text-base py-3 px-3 border-slate-300 rounded-xl w-full mt-1 text-slate-900"
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <label className="text-xs font-bold uppercase text-slate-700">Tipus IVA</label>
-                                    <select 
-                                      value={l.ivaPercent}
-                                      onChange={e => actualitzarLinia(l.id, 'ivaPercent', Number(e.target.value))}
-                                      className="text-center font-extrabold text-base py-3 px-3 border-slate-300 rounded-xl w-full mt-1 bg-white text-slate-900"
-                                    >
-                                      <option value={21}>21% IVA</option>
-                                      <option value={10}>10% IVA</option>
-                                      <option value={4}>4% IVA</option>
-                                      <option value={0}>0% IVA</option>
-                                    </select>
-                                  </div>
-
-                                  <div className={`col-span-2 sm:col-span-1 text-right p-3 rounded-xl border ${theme.subtotalBg} shadow-sm`}>
-                                    <span className="text-[10px] font-black uppercase tracking-wider block opacity-90">Subtotal Línia</span>
-                                    <span className="text-xl font-black block mt-0.5">{formatEuro(subtotalLinia)}</span>
-                                  </div>
+                                {/* 2. Descripció Tècnica (En una sola línia ampla) */}
+                                <div className="flex-1 min-w-[260px]">
+                                  <input 
+                                    type="text" 
+                                    value={l.descripcio || ''} 
+                                    onChange={e => actualitzarLinia(l.id, 'descripcio', e.target.value)}
+                                    placeholder="Descripció tècnica addicional..."
+                                    className="text-xs font-semibold text-slate-700 border-slate-300 focus:border-sky-500 py-2.5 px-3 rounded-xl w-full bg-slate-50/50"
+                                    title="Descripció Tècnica"
+                                  />
                                 </div>
+
+                                {/* 3. Quantitat */}
+                                <div className="w-28 shrink-0">
+                                  <input 
+                                    type="number" 
+                                    step="any" 
+                                    value={l.quantitat} 
+                                    onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
+                                    className={`text-center font-black text-base py-2 px-2 ${theme.qtyBg} border-2 focus:bg-white rounded-xl shadow-inner w-full`}
+                                    title="Quantitat"
+                                  />
+                                </div>
+
+                                {/* 4. Preu Unitari (€) */}
+                                <div className="w-36 shrink-0">
+                                  <input 
+                                    type="number" 
+                                    step="0.01" 
+                                    value={l.preuUnitari} 
+                                    onChange={e => actualitzarLinia(l.id, 'preuUnitari', parseFloat(e.target.value) || 0)}
+                                    className="text-right font-extrabold text-sm py-2 px-3 border-2 border-slate-300 focus:border-sky-500 rounded-xl w-full text-slate-900"
+                                    title="Preu Unitari"
+                                  />
+                                </div>
+
+                                {/* 5. Descompte (%) */}
+                                <div className="w-24 shrink-0">
+                                  <input 
+                                    type="number" 
+                                    step="1" 
+                                    value={l.descomptePercent} 
+                                    onChange={e => actualitzarLinia(l.id, 'descomptePercent', parseFloat(e.target.value) || 0)}
+                                    className="text-right font-bold text-xs py-2 px-2 border border-slate-300 rounded-xl w-full text-slate-900"
+                                    title="Descompte %"
+                                  />
+                                </div>
+
+                                {/* 6. Tipus IVA */}
+                                <div className="w-24 shrink-0">
+                                  <select 
+                                    value={l.ivaPercent}
+                                    onChange={e => actualitzarLinia(l.id, 'ivaPercent', Number(e.target.value))}
+                                    className="text-center font-extrabold text-xs py-2 px-2 border border-slate-300 rounded-xl w-full bg-white text-slate-900"
+                                    title="IVA"
+                                  >
+                                    <option value={21}>21%</option>
+                                    <option value={10}>10%</option>
+                                    <option value={4}>4%</option>
+                                    <option value={0}>0%</option>
+                                  </select>
+                                </div>
+
+                                {/* 7. Subtotal Línia (€) */}
+                                <div className={`w-36 shrink-0 text-right px-3 py-1.5 rounded-xl border ${theme.subtotalBg} shadow-sm`}>
+                                  <span className="text-[9px] font-black uppercase tracking-wider block opacity-90">Subtotal</span>
+                                  <span className="text-sm font-black block mt-0.5">{formatEuro(subtotalLinia)}</span>
+                                </div>
+
+                                {/* 8. Acció Eliminar */}
+                                <button 
+                                  type="button" 
+                                  onClick={() => eliminarLinia(l.id)}
+                                  className="text-rose-500 hover:text-rose-700 p-2 rounded-xl hover:bg-rose-50 border border-slate-200 shrink-0 transition-colors"
+                                  title="Eliminar línia"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
                               </div>
                             );
                           })}
