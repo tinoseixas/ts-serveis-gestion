@@ -466,103 +466,118 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                   </div>
                 </div>
 
-                <div className="table-container bg-white shadow-sm border border-slate-200 rounded-2xl overflow-x-auto">
-                  <table className="w-full min-w-[950px]">
-                    <thead>
-                      <tr className="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider">
-                        <th className="p-4 text-left min-w-[320px]">Concepte / Descripció de la Factura</th>
-                        <th className="p-4 w-44 text-center">Quantitat</th>
-                        <th className="p-4 w-48 text-right">Preu Unitari (€)</th>
-                        <th className="p-4 w-32 text-right">Desc. %</th>
-                        <th className="p-4 w-32 text-center">Tipus IVA</th>
-                        <th className="p-4 w-48 text-right">Subtotal (€)</th>
-                        <th className="p-4 w-14 text-center"></th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {(facturaActual.linies || []).map((l) => {
-                        const base = l.preuUnitari * l.quantitat;
-                        const desc = (base * (l.descomptePercent || 0)) / 100;
-                        const subtotalLinia = base - desc;
+                {/* Llista organitzada de línies de la factura */}
+                {(facturaActual.linies || []).length === 0 ? (
+                  <div className="text-center py-8 text-sm text-slate-500 italic border-2 border-dashed border-slate-200 rounded-xl bg-slate-50">
+                    Cap concepte afegit a aquesta factura. Fes clic a "+ Carregar des del Catàleg" o "+ Concepte Manual".
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {(facturaActual.linies || []).map((l, indexLinia) => {
+                      const base = l.preuUnitari * l.quantitat;
+                      const desc = (base * (l.descomptePercent || 0)) / 100;
+                      const subtotalLinia = base - desc;
 
-                        return (
-                          <tr key={l.id} className="hover:bg-indigo-50/30 transition-colors">
-                            <td className="p-3.5">
-                              <div className="space-y-2">
-                                <input 
-                                  type="text" 
-                                  value={l.nom} 
-                                  onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
-                                  placeholder="Descripció del servei o producte"
-                                  className="font-bold text-base text-slate-900 border-slate-300 focus:border-indigo-500 py-2 px-3"
-                                />
-                                <input 
-                                  type="text" 
-                                  value={l.descripcio || ''} 
-                                  onChange={e => actualitzarLinia(l.id, 'descripcio', e.target.value)}
-                                  placeholder="Detalls addicionals..."
-                                  className="text-xs text-slate-600 border-slate-200 py-1.5 px-3"
-                                />
+                      return (
+                        <div key={l.id} className="p-5 rounded-2xl border-2 border-slate-200 bg-white space-y-4 shadow-sm hover:border-indigo-300 transition-all">
+                          {/* Fila 1: Nom del Concepte / Servei i Accions */}
+                          <div className="flex items-start gap-4">
+                            <div className="flex-1 space-y-1.5">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[11px] font-extrabold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 uppercase border border-indigo-200">
+                                  Línia #{indexLinia + 1}
+                                </span>
+                                <label className="text-xs font-extrabold uppercase text-slate-700 tracking-wider">Concepte / Descripció del Servei *</label>
                               </div>
-                            </td>
-                            <td className="p-3.5 w-44">
+                              <input 
+                                type="text" 
+                                value={l.nom} 
+                                onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
+                                placeholder="Ex: Manteniment mensual, Assessorament tècnic, Subministrament..."
+                                className="font-extrabold text-base sm:text-lg text-slate-900 border-slate-300 focus:border-indigo-500 py-3 px-4 rounded-xl w-full"
+                              />
+                            </div>
+                            <button 
+                              type="button" 
+                              onClick={() => eliminarLinia(l.id)}
+                              className="text-rose-500 hover:text-rose-700 p-3 rounded-xl hover:bg-rose-50 border border-slate-200 hover:border-rose-300 transition-colors mt-7 shrink-0"
+                              title="Eliminar aquesta línia"
+                            >
+                              <Trash2 size={20} />
+                            </button>
+                          </div>
+
+                          {/* Fila 2: Descripció Addicional (Super Ampla) */}
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-slate-600 uppercase">Detalls Addicionals de la Factura (Opcional)</label>
+                            <input 
+                              type="text" 
+                              value={l.descripcio || ''} 
+                              onChange={e => actualitzarLinia(l.id, 'descripcio', e.target.value)}
+                              placeholder="Detalls addicionals, període de prestació, referència..."
+                              className="text-sm text-slate-800 border-slate-300 focus:border-indigo-500 py-2.5 px-4 rounded-xl w-full bg-slate-50/50"
+                            />
+                          </div>
+
+                          {/* Fila 3: Reixeta Ampla de Preus, Quantitats, Descomptes i Subtotal */}
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 pt-3 border-t border-slate-100 items-end">
+                            <div>
+                              <label className="text-xs font-extrabold uppercase text-slate-700">Quantitat</label>
                               <input 
                                 type="number" 
                                 step="any" 
                                 value={l.quantitat} 
                                 onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
-                                className="text-center font-extrabold text-xl py-3 px-3 bg-indigo-50 border-2 border-indigo-400 focus:border-indigo-600 focus:bg-white text-indigo-950 rounded-xl shadow-inner"
+                                className="text-center font-black text-xl py-3 px-3 bg-indigo-50 border-2 border-indigo-400 focus:border-indigo-600 text-indigo-950 rounded-xl shadow-inner w-full mt-1"
                               />
-                            </td>
-                            <td className="p-3.5 w-48">
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-extrabold uppercase text-slate-700">Preu Unitari (€)</label>
                               <input 
                                 type="number" 
                                 step="0.01" 
                                 value={l.preuUnitari} 
                                 onChange={e => actualitzarLinia(l.id, 'preuUnitari', parseFloat(e.target.value) || 0)}
-                                className="text-right font-bold text-lg py-2.5 px-3 border-slate-300 focus:border-indigo-500"
+                                className="text-right font-extrabold text-lg py-3 px-3 border-2 border-slate-300 focus:border-indigo-500 rounded-xl w-full mt-1 text-slate-900"
                               />
-                            </td>
-                            <td className="p-3.5 w-32">
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-bold uppercase text-slate-700">Descompte (%)</label>
                               <input 
                                 type="number" 
                                 step="1" 
                                 value={l.descomptePercent} 
                                 onChange={e => actualitzarLinia(l.id, 'descomptePercent', parseFloat(e.target.value) || 0)}
-                                className="text-right font-bold text-sm py-2.5 px-2 border-slate-300"
+                                className="text-right font-bold text-base py-3 px-3 border-slate-300 rounded-xl w-full mt-1 text-slate-900"
                               />
-                            </td>
-                            <td className="p-3.5 w-32">
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-bold uppercase text-slate-700">Tipus IVA</label>
                               <select 
                                 value={l.ivaPercent}
                                 onChange={e => actualitzarLinia(l.id, 'ivaPercent', Number(e.target.value))}
-                                className="text-sm py-2.5 px-2 text-center font-extrabold border-slate-300"
+                                className="text-center font-extrabold text-base py-3 px-3 border-slate-300 rounded-xl w-full mt-1 bg-white text-slate-900"
                               >
-                                <option value={21}>21%</option>
-                                <option value={10}>10%</option>
-                                <option value={4}>4%</option>
-                                <option value={0}>0%</option>
+                                <option value={21}>21% IVA</option>
+                                <option value={10}>10% IVA</option>
+                                <option value={4}>4% IVA</option>
+                                <option value={0}>0% IVA</option>
                               </select>
-                            </td>
-                            <td className="p-3.5 text-right font-extrabold text-lg text-indigo-700 w-48">
-                              {formatEuro(subtotalLinia)}
-                            </td>
-                            <td className="p-3.5 text-center w-14">
-                              <button 
-                                type="button" 
-                                onClick={() => eliminarLinia(l.id)}
-                                className="text-rose-500 hover:text-rose-700 p-2 rounded-xl hover:bg-rose-50 transition-colors"
-                                title="Eliminar línia"
-                              >
-                                <X size={20} />
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                            </div>
+
+                            <div className="col-span-2 sm:col-span-1 text-right bg-indigo-50 p-3 rounded-xl border border-indigo-200">
+                              <span className="text-[10px] font-black uppercase tracking-wider text-indigo-800 block">Subtotal Línia</span>
+                              <span className="text-xl font-black text-indigo-700 block mt-0.5">{formatEuro(subtotalLinia)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Totals i Resum Final */}
