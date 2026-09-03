@@ -24,6 +24,79 @@ interface QuoteManagerProps {
   onConvertToFactura: (pressupost: Pressupost) => void;
 }
 
+const SECTOR_THEMES = [
+  {
+    border: 'border-sky-500',
+    bg: 'bg-sky-50/60',
+    headerBg: 'bg-sky-100/90 border-sky-300',
+    tagBg: 'bg-sky-600 text-white',
+    titleText: 'text-sky-900 font-black',
+    subtotalBg: 'bg-sky-100 border-sky-300 text-sky-900',
+    qtyBg: 'bg-sky-100/80 border-sky-400 text-sky-950',
+    hoverBorder: 'hover:border-sky-400'
+  },
+  {
+    border: 'border-indigo-500',
+    bg: 'bg-indigo-50/60',
+    headerBg: 'bg-indigo-100/90 border-indigo-300',
+    tagBg: 'bg-indigo-600 text-white',
+    titleText: 'text-indigo-900 font-black',
+    subtotalBg: 'bg-indigo-100 border-indigo-300 text-indigo-900',
+    qtyBg: 'bg-indigo-100/80 border-indigo-400 text-indigo-950',
+    hoverBorder: 'hover:border-indigo-400'
+  },
+  {
+    border: 'border-emerald-500',
+    bg: 'bg-emerald-50/60',
+    headerBg: 'bg-emerald-100/90 border-emerald-300',
+    tagBg: 'bg-emerald-600 text-white',
+    titleText: 'text-emerald-900 font-black',
+    subtotalBg: 'bg-emerald-100 border-emerald-300 text-emerald-900',
+    qtyBg: 'bg-emerald-100/80 border-emerald-400 text-emerald-950',
+    hoverBorder: 'hover:border-emerald-400'
+  },
+  {
+    border: 'border-amber-500',
+    bg: 'bg-amber-50/60',
+    headerBg: 'bg-amber-100/90 border-amber-300',
+    tagBg: 'bg-amber-600 text-white',
+    titleText: 'text-amber-900 font-black',
+    subtotalBg: 'bg-amber-100 border-amber-300 text-amber-900',
+    qtyBg: 'bg-amber-100/80 border-amber-400 text-amber-950',
+    hoverBorder: 'hover:border-amber-400'
+  },
+  {
+    border: 'border-purple-500',
+    bg: 'bg-purple-50/60',
+    headerBg: 'bg-purple-100/90 border-purple-300',
+    tagBg: 'bg-purple-600 text-white',
+    titleText: 'text-purple-900 font-black',
+    subtotalBg: 'bg-purple-100 border-purple-300 text-purple-900',
+    qtyBg: 'bg-purple-100/80 border-purple-400 text-purple-950',
+    hoverBorder: 'hover:border-purple-400'
+  },
+  {
+    border: 'border-rose-500',
+    bg: 'bg-rose-50/60',
+    headerBg: 'bg-rose-100/90 border-rose-300',
+    tagBg: 'bg-rose-600 text-white',
+    titleText: 'text-rose-900 font-black',
+    subtotalBg: 'bg-rose-100 border-rose-300 text-rose-900',
+    qtyBg: 'bg-rose-100/80 border-rose-400 text-rose-950',
+    hoverBorder: 'hover:border-rose-400'
+  },
+  {
+    border: 'border-teal-500',
+    bg: 'bg-teal-50/60',
+    headerBg: 'bg-teal-100/90 border-teal-300',
+    tagBg: 'bg-teal-600 text-white',
+    titleText: 'text-teal-900 font-black',
+    subtotalBg: 'bg-teal-100 border-teal-300 text-teal-900',
+    qtyBg: 'bg-teal-100/80 border-teal-400 text-teal-950',
+    hoverBorder: 'hover:border-teal-400'
+  }
+];
+
 export const QuoteManager: React.FC<QuoteManagerProps> = ({
   pressupostos,
   clients,
@@ -479,13 +552,14 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
 
                 {pressupostActual.sectors?.map((sec, secIdx) => {
                   const liniesSector = (pressupostActual.linies || []).filter(l => l.sectorId === sec.id);
+                  const theme = SECTOR_THEMES[secIdx % SECTOR_THEMES.length];
 
                   return (
-                    <div key={sec.id} className="card p-6 space-y-5 border-2 border-slate-200 bg-white shadow-md rounded-2xl">
-                      {/* Encapçalament del Sector */}
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div key={sec.id} className={`card p-6 space-y-5 border-2 border-l-8 ${theme.border} ${theme.bg} shadow-md rounded-2xl`}>
+                      {/* Encapçalament del Sector amb Color de Distinció */}
+                      <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border ${theme.headerBg} shadow-sm`}>
                         <div className="flex items-center gap-3 flex-1 w-full sm:w-auto">
-                          <span className="font-extrabold text-xs px-3.5 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 border border-indigo-200 uppercase tracking-wider shrink-0">
+                          <span className={`font-black text-xs px-3.5 py-1.5 rounded-lg ${theme.tagBg} uppercase tracking-wider shrink-0 shadow-sm`}>
                             Sector {secIdx + 1}
                           </span>
                           <input 
@@ -498,7 +572,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                 sectors: prev.sectors?.map(s => s.id === sec.id ? { ...s, nom: nomNou } : s)
                               }));
                             }}
-                            className="font-extrabold text-lg bg-white border border-slate-300 focus:border-sky-500 rounded-lg px-3 py-1.5 text-slate-900 w-full"
+                            className={`font-extrabold text-lg bg-white border border-slate-300 focus:border-sky-500 rounded-lg px-3.5 py-1.5 ${theme.titleText} w-full shadow-sm`}
                             placeholder="Nom del Sector (ex: Demolicions i Neteja)"
                           />
                         </div>
@@ -512,7 +586,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                 e.target.value = '';
                               }
                             }}
-                            className="text-xs font-bold py-2 px-3 bg-white border-slate-300 text-slate-800"
+                            className="text-xs font-extrabold py-2 px-3 bg-white border-slate-300 text-slate-800 shadow-sm"
                           >
                             <option value="">+ Carregar des del Catàleg</option>
                             {articles.map(a => (
@@ -522,7 +596,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                           <button 
                             type="button" 
                             onClick={() => afegirLiniaASector(sec.id)}
-                            className="btn btn-secondary btn-sm text-xs font-bold bg-white"
+                            className="btn btn-secondary btn-sm text-xs font-bold bg-white border-slate-300 shadow-sm"
                             title="Afegir línia manual"
                           >
                             + Línia Personalitzada
@@ -530,7 +604,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                           <button 
                             type="button" 
                             onClick={() => eliminarSector(sec.id)}
-                            className="btn btn-secondary btn-icon btn-sm text-rose-600 hover:bg-rose-50 border-rose-200 bg-white"
+                            className="btn btn-secondary btn-icon btn-sm text-rose-600 hover:bg-rose-50 border-rose-200 bg-white shadow-sm"
                             title="Eliminar sector"
                           >
                             <Trash2 size={16} />
@@ -540,7 +614,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
 
                       {/* Llista organitzada d'articles d'aquest sector */}
                       {liniesSector.length === 0 ? (
-                        <div className="text-center py-8 text-sm text-slate-500 italic border-2 border-dashed border-slate-200 rounded-xl bg-slate-50">
+                        <div className="text-center py-8 text-sm text-slate-500 italic border-2 border-dashed border-slate-200 rounded-xl bg-white">
                           Cap article afegit a aquest sector. Fes clic a "+ Carregar des del Catàleg" o "+ Línia Personalitzada".
                         </div>
                       ) : (
@@ -551,13 +625,13 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                             const subtotalLinia = base - desc;
 
                             return (
-                              <div key={l.id} className="p-5 rounded-2xl border-2 border-slate-200 bg-white space-y-4 shadow-sm hover:border-sky-300 transition-all">
+                              <div key={l.id} className={`p-5 rounded-2xl border-2 border-slate-200 bg-white space-y-4 shadow-sm ${theme.hoverBorder} transition-all`}>
                                 {/* Fila 1: Nom de l'Article / Servei i Accions */}
                                 <div className="flex items-start gap-4">
                                   <div className="flex-1 space-y-1.5">
                                     <div className="flex items-center gap-2">
-                                      <span className="text-[11px] font-extrabold px-2 py-0.5 rounded bg-slate-100 text-slate-600 uppercase">
-                                        Línia #{indexLinia + 1}
+                                      <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded ${theme.tagBg} uppercase shadow-sm`}>
+                                        S{secIdx + 1} · Línia #{indexLinia + 1}
                                       </span>
                                       <label className="text-xs font-extrabold uppercase text-slate-700 tracking-wider">Concepte / Nom de l'Article o Servei *</label>
                                     </div>
@@ -600,7 +674,7 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                       step="any" 
                                       value={l.quantitat} 
                                       onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
-                                      className="text-center font-black text-xl py-3 px-3 bg-sky-50 border-2 border-sky-400 focus:border-sky-600 text-sky-950 rounded-xl shadow-inner w-full mt-1"
+                                      className={`text-center font-black text-xl py-3 px-3 ${theme.qtyBg} border-2 focus:bg-white rounded-xl shadow-inner w-full mt-1`}
                                     />
                                   </div>
 
@@ -640,9 +714,9 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                     </select>
                                   </div>
 
-                                  <div className="col-span-2 sm:col-span-1 text-right bg-sky-50 p-3 rounded-xl border border-sky-200">
-                                    <span className="text-[10px] font-black uppercase tracking-wider text-sky-800 block">Subtotal Línia</span>
-                                    <span className="text-xl font-black text-sky-700 block mt-0.5">{formatEuro(subtotalLinia)}</span>
+                                  <div className={`col-span-2 sm:col-span-1 text-right p-3 rounded-xl border ${theme.subtotalBg} shadow-sm`}>
+                                    <span className="text-[10px] font-black uppercase tracking-wider block opacity-90">Subtotal Línia</span>
+                                    <span className="text-xl font-black block mt-0.5">{formatEuro(subtotalLinia)}</span>
                                   </div>
                                 </div>
                               </div>
