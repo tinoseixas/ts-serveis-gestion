@@ -317,12 +317,30 @@ tr:hover td {
 
 /* Print / PDF Styling */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 15mm 12mm 15mm;
+  }
   body {
     background: #ffffff !important;
     color: #000000 !important;
   }
   .no-print {
     display: none !important;
+  }
+  .modal-overlay {
+    position: static !important;
+    padding: 0 !important;
+    background: none !important;
+    backdrop-filter: none !important;
+  }
+  .modal-content {
+    border: none !important;
+    box-shadow: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   .print-only {
     display: block !important;
