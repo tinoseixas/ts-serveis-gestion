@@ -8,7 +8,7 @@ import {
   Eye, 
   X 
 } from 'lucide-react';
-import type { Factura, Client, Article, LiniaItem, EstatFactura, FormaPagament, Empresa } from '../types';
+import type { Factura, Client, Article, LiniaItem, EstatFactura, Empresa } from '../types';
 import { PdfPreviewModal } from './PdfPreviewModal';
 
 interface InvoiceManagerProps {
@@ -324,78 +324,95 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
         </div>
       </div>
 
-      {/* Modal Formulari Factura */}
+      {/* Modal Formulari Factura en estil FacturasCLOUD */}
       {modalObert && (
         <div className="modal-overlay p-2 sm:p-4">
-          <div className="modal-content modal-content-wide max-w-[96vw] w-[96vw] p-6 sm:p-8 lg:p-10 space-y-8 animate-fade-in my-auto">
-            <div className="flex items-center justify-between border-b border-[var(--border)] pb-5">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-2xl bg-indigo-100 text-indigo-600">
-                  <FileText size={28} />
-                </div>
-                <div>
-                  <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                    {facturaActual.numero ? `Editar Factura (${facturaActual.numero})` : 'Nova Factura Comercial'}
-                  </h3>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">Emets una factura oficial amb impostos i condicions de cobrament.</p>
+          <div className="modal-content modal-content-wide max-w-[96vw] w-[96vw] bg-white rounded-xl shadow-2xl p-6 sm:p-8 space-y-6 animate-fade-in my-auto border border-slate-200">
+            {/* Capçalera amb Pestanya "Informació General" */}
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="bg-slate-800 text-amber-400 font-extrabold text-sm px-5 py-2 rounded-t-lg shadow-sm border-t-2 border-amber-400 flex items-center gap-2">
+                  <FileText size={16} /> Informació General
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary text-slate-600">
+                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary text-slate-600 py-1.5 px-4 text-xs font-bold">
                   Descartar
                 </button>
-                <button type="button" onClick={(e) => { e.preventDefault(); guardar(e as any); }} className="btn btn-primary font-extrabold px-6 bg-indigo-600 hover:bg-indigo-700">
+                <button type="button" onClick={(e) => { e.preventDefault(); guardar(e as any); }} className="bg-slate-800 hover:bg-slate-900 text-white font-extrabold px-5 py-1.5 rounded-lg text-xs shadow-md">
                   Guardar Factura
                 </button>
-                <button onClick={() => setModalObert(false)} className="btn btn-secondary btn-icon ml-2">
+                <button onClick={() => setModalObert(false)} className="text-slate-400 hover:text-slate-600 p-1">
                   <X size={22} />
                 </button>
               </div>
             </div>
 
-            <form onSubmit={guardar} className="space-y-8">
-              {/* Dades Principals de la Factura */}
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">1. Dades Principals de la Factura</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase">Client *</label>
+            <form onSubmit={guardar} className="space-y-6">
+              {/* 1. SECCIÓ INFORMACIÓ GENERAL */}
+              <div className="space-y-4 text-slate-800 text-sm bg-slate-50/50 p-5 rounded-xl border border-slate-200">
+                {/* Fila 1: Client + Botó Nou Client */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                  <div className="md:col-span-8 space-y-1">
+                    <label className="text-xs font-bold text-slate-600">Client *</label>
                     <select 
                       value={facturaActual.clientId || ''}
                       onChange={(e) => seleccioClientHandler(e.target.value)}
                       required
-                      className="font-bold text-sm bg-white border-slate-300 text-slate-900 py-3"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-slate-400 bg-white"
                     >
-                      <option value="">-- Selecciona Client --</option>
+                      <option value="">Selecciona un Client...</option>
                       {clients.map(c => (
                         <option key={c.id} value={c.id}>{c.nom} ({c.cifNif || 'Sense NIF'})</option>
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase">Data d'Emissió</label>
+                  <div className="md:col-span-4">
+                    <button 
+                      type="button" 
+                      onClick={() => alert("Per afegir un client nou, utilitza la secció de Clients a la barra lateral.")}
+                      className="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow-sm"
+                    >
+                      + Nou Client
+                    </button>
+                  </div>
+                </div>
+
+                {/* Fila 2: Data Emissió, Data Venciment, Número i Estat */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-600">Data Factura *</label>
                     <input 
                       type="date" 
                       value={facturaActual.data || ''} 
                       onChange={e => setFacturaActual({ ...facturaActual, data: e.target.value })}
-                      className="font-semibold text-sm bg-white border-slate-300 py-3 text-slate-900"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 bg-white"
                     />
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase">Data de Venciment</label>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-600">Data Venciment</label>
                     <input 
                       type="date" 
                       value={facturaActual.dataVenciment || ''} 
                       onChange={e => setFacturaActual({ ...facturaActual, dataVenciment: e.target.value })}
-                      className="font-semibold text-sm bg-white border-slate-300 py-3 text-slate-900"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 bg-white"
                     />
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase">Estat de Pagament</label>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-600">Número Factura *</label>
+                    <input 
+                      type="text" 
+                      value={facturaActual.numero || ''} 
+                      onChange={e => setFacturaActual({ ...facturaActual, numero: e.target.value })}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-indigo-700 bg-white"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-600">Estat de Cobrament</label>
                     <select 
                       value={facturaActual.estat || 'pendent'}
                       onChange={e => setFacturaActual({ ...facturaActual, estat: e.target.value as EstatFactura })}
-                      className="font-extrabold text-sm bg-white border-slate-300 text-indigo-700 py-3"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-extrabold text-indigo-700 bg-white"
                     >
                       <option value="pendent">⏳ Pendent de pagament</option>
                       <option value="pagada">💰 Pagada (Cobrada)</option>
@@ -403,163 +420,156 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                       <option value="anul.lada">🚫 Anul·lada</option>
                     </select>
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase">Forma de Pagament</label>
-                    <select 
-                      value={facturaActual.formaPagament || 'transferencia'}
-                      onChange={e => setFacturaActual({ ...facturaActual, formaPagament: e.target.value as FormaPagament })}
-                      className="font-semibold text-sm bg-white border-slate-300 py-3 text-slate-900"
-                    >
-                      <option value="transferencia">🏛️ Transferència Bancària</option>
-                      <option value="efectiu">💵 Efectiu</option>
-                      <option value="domiciliacio">💳 Domiciliació Bancària</option>
-                      <option value="targeta">💳 Targeta de Crèdit</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase">Retenció IRPF (%)</label>
-                    <input 
-                      type="number" 
-                      step="1"
-                      placeholder="0" 
-                      value={facturaActual.irpfPercent ?? 0}
-                      onChange={e => {
-                        const irpf = parseFloat(e.target.value) || 0;
-                        setFacturaActual(prev => ({
-                          ...prev,
-                          irpfPercent: irpf,
-                          ...calcularTotals(prev.linies || [], irpf)
-                        }));
-                      }}
-                      className="font-extrabold text-sm bg-white border-slate-300 py-3 text-slate-900"
-                    />
-                  </div>
+                </div>
+
+                {/* Fila 3: Resum del Document */}
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-600">Resum del Document</label>
+                  <input 
+                    type="text" 
+                    value={facturaActual.notes || ''} 
+                    onChange={e => setFacturaActual({ ...facturaActual, notes: e.target.value })}
+                    placeholder="Escriu en aquest camp el resum d'aquest document (Solo será visible por ti)..."
+                    className="w-full border border-slate-300 rounded-lg px-3.5 py-2 text-sm text-slate-800 bg-white placeholder-slate-400"
+                  />
                 </div>
               </div>
 
-              {/* Línies de la Factura */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">2. Línies de Treball i Productes</h4>
-                    <p className="text-sm font-extrabold text-slate-800 mt-0.5">Defineix els serveis o productes d'aquesta factura.</p>
-                  </div>
-                  <div className="flex items-center gap-3">
+              {/* 2. SECCIÓ LÍNEES DE DETALL */}
+              <div className="space-y-4 pt-2">
+                <div className="border-b border-slate-300 pb-2">
+                  <h4 className="text-lg font-extrabold text-slate-800">Línies de Detall</h4>
+                </div>
+
+                {/* Cercador i Inserció de Productes del Catàleg */}
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-600">Productes i Serveis (Catàleg)</label>
+                  <div className="flex flex-wrap items-center gap-3">
                     <select 
+                      id="catalaSelect"
                       onChange={(e) => {
-                        if (e.target.value) {
-                          const art = articles.find(a => a.id === e.target.value);
-                          afegirLinia(art);
+                        const selectedId = e.target.value;
+                        if (selectedId) {
+                          const art = articles.find(a => a.id === selectedId);
+                          if (art) afegirLinia(art);
                           e.target.value = '';
                         }
                       }}
-                      className="text-xs font-bold py-2.5 px-3 bg-white border-slate-300 text-slate-800"
+                      className="flex-1 min-w-[280px] border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white"
                     >
-                      <option value="">+ Carregar des del Catàleg</option>
+                      <option value="">Selecciona un Producte o Servei...</option>
                       {articles.map(a => (
                         <option key={a.id} value={a.id}>{a.nom} ({formatEuro(a.preuUnitari)})</option>
                       ))}
                     </select>
-                    <button type="button" onClick={() => afegirLinia()} className="btn btn-secondary font-bold text-xs py-2.5 bg-white">
-                      + Concepte Manual
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        const el = document.getElementById('catalaSelect') as HTMLSelectElement;
+                        if (el && el.value) {
+                          const art = articles.find(a => a.id === el.value);
+                          if (art) afegirLinia(art);
+                          el.value = '';
+                        }
+                      }}
+                      className="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-2.5 rounded-lg border border-slate-300"
+                    >
+                      Insertar
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => alert("Per afegir un nou article al catàleg general, utilitza la secció de Catàleg d'Articles.")}
+                      className="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow-sm"
+                    >
+                      + Nou Producte o Servei
                     </button>
                   </div>
                 </div>
 
-                {/* Llista organitzada de línies de la factura en UNA SOLA LÍNIA */}
-                {(facturaActual.linies || []).length === 0 ? (
-                  <div className="text-center py-8 text-sm text-slate-500 italic border-2 border-dashed border-slate-200 rounded-xl bg-slate-50">
-                    Cap concepte afegit a aquesta factura. Fes clic a "+ Carregar des del Catàleg" o "+ Concepte Manual".
-                  </div>
-                ) : (
-                  <div className="space-y-3 overflow-x-auto pb-2">
-                    {/* Capçalera de Columnes per a Línies */}
-                    <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-100 rounded-xl border border-slate-200 text-xs font-black uppercase text-slate-600 tracking-wider min-w-[1050px] shadow-sm">
-                      <div className="w-[220px] shrink-0">Codi / Concepte</div>
-                      <div className="flex-1 min-w-[260px]">Descripció Tècnica</div>
-                      <div className="w-28 text-center shrink-0">Quantitat</div>
-                      <div className="w-36 text-right shrink-0">Preu U. (€)</div>
-                      <div className="w-24 text-right shrink-0">Desc. %</div>
-                      <div className="w-24 text-center shrink-0">Tipus IVA</div>
-                      <div className="w-36 text-right shrink-0">Subtotal (€)</div>
-                      <div className="w-10 text-center shrink-0"></div>
+                {/* Taula Visual de Línies exactament com la imatge de FacturasCLOUD */}
+                <div className="space-y-2 overflow-x-auto pt-2 pb-2">
+                  {/* Fila de Capçaleres amb Línia d'Enquadrament */}
+                  <div className="flex items-center gap-2 px-1 text-xs font-bold text-slate-700 min-w-[920px] border-b border-slate-300 pb-1">
+                    <div className="w-8 text-center text-amber-500">
+                      <span className="text-base font-extrabold">↕</span>
                     </div>
+                    <div className="flex-1 min-w-[320px] px-2 text-left">Descripció</div>
+                    <div className="w-28 text-center px-2">Quantitat</div>
+                    <div className="w-32 text-right px-2">Preu (€)</div>
+                    <div className="w-20 text-right px-2">Desc %</div>
+                    <div className="w-24 text-center px-2">IVA %</div>
+                    <div className="w-36 text-right px-2">Subtotal</div>
+                    <div className="w-8 text-center"></div>
+                  </div>
 
-                    {/* Línies en una sola línia horitzontal */}
-                    {(facturaActual.linies || []).map((l, indexLinia) => {
+                  {/* Registres de línia */}
+                  {(facturaActual.linies || []).length === 0 ? (
+                    <div className="text-center py-6 text-sm text-slate-400 italic bg-slate-50 border border-slate-200 rounded-lg">
+                      Sense línies de detall. Fes clic a "Insertar Fila (F8)" a baix per afegir una línia.
+                    </div>
+                  ) : (
+                    (facturaActual.linies || []).map((l) => {
                       const base = l.preuUnitari * l.quantitat;
                       const desc = (base * (l.descomptePercent || 0)) / 100;
                       const subtotalLinia = base - desc;
 
                       return (
-                        <div key={l.id} className="flex items-center gap-3 p-3 rounded-2xl border-2 border-slate-200 bg-white shadow-sm hover:border-indigo-300 transition-all min-w-[1050px]">
-                          {/* 1. Codi / Nom de l'Article */}
-                          <div className="w-[220px] shrink-0">
+                        <div key={l.id} className="flex items-center gap-2 min-w-[920px]">
+                          {/* Icona reordenar ↕ */}
+                          <div className="w-8 text-center text-amber-500 cursor-grab font-black text-lg">
+                            ↕
+                          </div>
+
+                          {/* Campo Descripció (Super Ample) */}
+                          <div className="flex-1 min-w-[320px]">
                             <input 
                               type="text" 
                               value={l.nom} 
                               onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
-                              placeholder="Nom / Codi..."
-                              className="font-extrabold text-sm text-slate-900 border-slate-300 focus:border-indigo-500 py-2.5 px-3 rounded-xl w-full"
-                              title={`Línia #${indexLinia + 1} - Codi/Nom`}
+                              placeholder="Escriu la descripció del concepte o servei..."
+                              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-900 focus:ring-2 focus:ring-slate-400 bg-white"
                             />
                           </div>
 
-                          {/* 2. Descripció Tècnica (En una sola línia ampla) */}
-                          <div className="flex-1 min-w-[260px]">
-                            <input 
-                              type="text" 
-                              value={l.descripcio || ''} 
-                              onChange={e => actualitzarLinia(l.id, 'descripcio', e.target.value)}
-                              placeholder="Descripció tècnica addicional..."
-                              className="text-xs font-semibold text-slate-700 border-slate-300 focus:border-indigo-500 py-2.5 px-3 rounded-xl w-full bg-slate-50/50"
-                              title="Descripció Tècnica"
-                            />
-                          </div>
-
-                          {/* 3. Quantitat */}
-                          <div className="w-28 shrink-0">
+                          {/* Quantitat */}
+                          <div className="w-28">
                             <input 
                               type="number" 
                               step="any" 
                               value={l.quantitat} 
                               onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
-                              className="text-center font-black text-base py-2 px-2 bg-indigo-50 border-2 border-indigo-400 focus:bg-white text-indigo-950 rounded-xl shadow-inner w-full"
-                              title="Quantitat"
+                              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-center font-bold text-slate-900 bg-white"
                             />
                           </div>
 
-                          {/* 4. Preu Unitari (€) */}
-                          <div className="w-36 shrink-0">
+                          {/* Preu (€) */}
+                          <div className="w-32">
                             <input 
                               type="number" 
                               step="0.01" 
                               value={l.preuUnitari} 
                               onChange={e => actualitzarLinia(l.id, 'preuUnitari', parseFloat(e.target.value) || 0)}
-                              className="text-right font-extrabold text-sm py-2 px-3 border-2 border-slate-300 focus:border-indigo-500 rounded-xl w-full text-slate-900"
-                              title="Preu Unitari"
+                              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-right font-bold text-slate-900 bg-white"
                             />
                           </div>
 
-                          {/* 5. Descompte (%) */}
-                          <div className="w-24 shrink-0">
+                          {/* Descompte % */}
+                          <div className="w-20">
                             <input 
                               type="number" 
                               step="1" 
-                              value={l.descomptePercent} 
+                              value={l.descomptePercent || 0} 
                               onChange={e => actualitzarLinia(l.id, 'descomptePercent', parseFloat(e.target.value) || 0)}
-                              className="text-right font-bold text-xs py-2 px-2 border border-slate-300 rounded-xl w-full text-slate-900"
-                              title="Descompte %"
+                              className="w-full border border-slate-300 rounded-lg px-2 py-2 text-sm text-right text-slate-800 bg-white"
                             />
                           </div>
 
-                          {/* 6. Tipus IVA */}
-                          <div className="w-24 shrink-0">
+                          {/* IVA % */}
+                          <div className="w-24">
                             <select 
                               value={l.ivaPercent}
                               onChange={e => actualitzarLinia(l.id, 'ivaPercent', Number(e.target.value))}
-                              className="text-center font-extrabold text-xs py-2 px-2 border border-slate-300 rounded-xl w-full bg-white text-slate-900"
-                              title="IVA"
+                              className="w-full border border-slate-300 rounded-lg px-1 py-2 text-sm text-center font-semibold text-slate-800 bg-white"
                             >
                               <option value={21}>21%</option>
                               <option value={10}>10%</option>
@@ -568,67 +578,80 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                             </select>
                           </div>
 
-                          {/* 7. Subtotal Línia (€) */}
-                          <div className="w-36 shrink-0 text-right px-3 py-1.5 rounded-xl border border-indigo-200 bg-indigo-50 shadow-sm">
-                            <span className="text-[9px] font-black uppercase tracking-wider text-indigo-800 block">Subtotal</span>
-                            <span className="text-sm font-black text-indigo-700 block mt-0.5">{formatEuro(subtotalLinia)}</span>
+                          {/* Subtotal (Lectura en fons gris nítid) */}
+                          <div className="w-36 bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-sm font-extrabold text-right text-slate-900">
+                            {formatEuro(subtotalLinia)}
                           </div>
 
-                          {/* 8. Acció Eliminar */}
-                          <button 
-                            type="button" 
-                            onClick={() => eliminarLinia(l.id)}
-                            className="text-rose-500 hover:text-rose-700 p-2 rounded-xl hover:bg-rose-50 border border-slate-200 shrink-0 transition-colors"
-                            title="Eliminar línia"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                          {/* Botó X d'Eliminar Línia (Cercle vermell/taronja com la imatge) */}
+                          <div className="w-8 flex justify-center">
+                            <button 
+                              type="button" 
+                              onClick={() => eliminarLinia(l.id)}
+                              className="w-6 h-6 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold flex items-center justify-center text-xs shadow-sm transition-transform active:scale-95"
+                              title="Eliminar fila"
+                            >
+                              ✕
+                            </button>
+                          </div>
                         </div>
                       );
-                    })}
-                  </div>
-                )}
+                    })
+                  )}
+                </div>
+
+                {/* Botó Inferior Esquerra "Insertar Fila (F8)" com la imatge */}
+                <div className="pt-2">
+                  <button 
+                    type="button" 
+                    onClick={() => afegirLinia()} 
+                    className="bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg shadow-md flex items-center gap-2"
+                  >
+                    Insertar Fila (F8)
+                  </button>
+                </div>
               </div>
 
-              {/* Totals i Resum Final */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                <div>
-                  <label className="text-xs font-bold text-slate-700 uppercase">Notes i Instruccions de Pagament</label>
+              {/* 3. RESUM I TOTALS FINALS */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-200">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-600">Notes i Instruccions de Pagament</label>
                   <textarea 
-                    rows={4} 
+                    rows={3} 
                     value={facturaActual.notes || ''} 
                     onChange={e => setFacturaActual({ ...facturaActual, notes: e.target.value })}
-                    placeholder="Número de compte bancari IBAN, dades de transferència..."
-                    className="bg-white border-slate-300 text-sm mt-1"
+                    placeholder="Informació bancària, IBAN, dades de transferència..."
+                    className="w-full border border-slate-300 rounded-lg p-3 text-sm text-slate-800 bg-white"
                   />
                 </div>
-                <div className="space-y-3 justify-self-end w-full max-w-sm text-sm bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                  <div className="flex justify-between text-slate-600 font-medium">
+                <div className="bg-slate-50 p-5 rounded-xl border border-slate-300 space-y-2.5 text-sm">
+                  <div className="flex justify-between font-semibold text-slate-700">
                     <span>Base Imponible Totals:</span>
                     <span className="font-bold text-slate-900">{formatEuro(facturaActual.subtotal || 0)}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600 font-medium">
+                  <div className="flex justify-between font-semibold text-slate-700">
                     <span>Quota d'IVA Total:</span>
                     <span className="font-bold text-slate-900">{formatEuro(facturaActual.totalIva || 0)}</span>
                   </div>
                   {(facturaActual.irpfPercent || 0) > 0 && (
-                    <div className="flex justify-between text-rose-600 font-medium">
+                    <div className="flex justify-between font-semibold text-rose-600">
                       <span>Retenció IRPF (-{facturaActual.irpfPercent}%):</span>
                       <span className="font-bold">-{formatEuro(facturaActual.totalIrpf || 0)}</span>
                     </div>
                   )}
-                  <div className="border-t-2 border-slate-200 pt-3 flex justify-between font-extrabold text-xl">
-                    <span className="text-slate-900">TOTAL FACTURA:</span>
-                    <span className="text-indigo-600">{formatEuro(facturaActual.total || 0)}</span>
+                  <div className="border-t border-slate-300 pt-2 flex justify-between font-black text-xl text-slate-900">
+                    <span>TOTAL FACTURA:</span>
+                    <span className="text-indigo-700">{formatEuro(facturaActual.total || 0)}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end items-center gap-4 pt-4 border-t border-slate-200">
-                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary font-bold px-6 py-3">
-                  Descartar Canvis
+              {/* Botons d'Acció al Peu */}
+              <div className="flex justify-end items-center gap-3 pt-4 border-t border-slate-200">
+                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary font-bold px-5 py-2.5">
+                  Descartar
                 </button>
-                <button type="submit" className="btn btn-primary font-extrabold px-8 py-3 text-base shadow-lg bg-indigo-600 hover:bg-indigo-700">
+                <button type="submit" className="bg-slate-800 hover:bg-slate-900 text-white font-extrabold px-7 py-2.5 rounded-lg shadow-lg text-base">
                   Guardar Factura
                 </button>
               </div>

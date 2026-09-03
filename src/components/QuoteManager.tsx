@@ -444,78 +444,95 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
         </div>
       </div>
 
-      {/* Modal d'Edició / Creació de Pressupost Avançat per Sectors */}
+      {/* Modal d'Edició / Creació de Pressupost en estil FacturasCLOUD */}
       {modalObert && (
         <div className="modal-overlay p-2 sm:p-4">
-          <div className="modal-content modal-content-wide max-w-[96vw] w-[96vw] p-6 sm:p-8 lg:p-10 space-y-8 animate-fade-in my-auto">
-            <div className="flex items-center justify-between border-b border-[var(--border)] pb-5">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-2xl bg-sky-100 text-sky-600">
-                  <FileSpreadsheet size={28} />
-                </div>
-                <div>
-                  <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                    {pressupostActual.numero ? `Editor de Pressupost (${pressupostActual.numero})` : 'Nou Pressupost per Sectors'}
-                  </h3>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">Organitza els articles per sectors i genera una oferta professional.</p>
+          <div className="modal-content modal-content-wide max-w-[96vw] w-[96vw] bg-white rounded-xl shadow-2xl p-6 sm:p-8 space-y-6 animate-fade-in my-auto border border-slate-200">
+            {/* Capçalera amb Pestanya "Informació General" */}
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="bg-slate-800 text-amber-400 font-extrabold text-sm px-5 py-2 rounded-t-lg shadow-sm border-t-2 border-amber-400 flex items-center gap-2">
+                  <FileSpreadsheet size={16} /> Informació General
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary text-slate-600">
+                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary text-slate-600 py-1.5 px-4 text-xs font-bold">
                   Descartar
                 </button>
-                <button type="button" onClick={(e) => { e.preventDefault(); guardar(e as any); }} className="btn btn-primary font-extrabold px-6">
+                <button type="button" onClick={(e) => { e.preventDefault(); guardar(e as any); }} className="bg-slate-800 hover:bg-slate-900 text-white font-extrabold px-5 py-1.5 rounded-lg text-xs shadow-md">
                   Guardar Pressupost
                 </button>
-                <button onClick={() => setModalObert(false)} className="btn btn-secondary btn-icon ml-2">
+                <button onClick={() => setModalObert(false)} className="text-slate-400 hover:text-slate-600 p-1">
                   <X size={22} />
                 </button>
               </div>
             </div>
 
-            <form onSubmit={guardar} className="space-y-8">
-              {/* Dades Principals del Document */}
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">1. Dades Generals del Document</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="col-span-1 sm:col-span-2 md:col-span-1">
-                    <label className="text-xs font-bold text-slate-700 uppercase">Client *</label>
+            <form onSubmit={guardar} className="space-y-6">
+              {/* 1. SECCIÓ INFORMACIÓ GENERAL */}
+              <div className="space-y-4 text-slate-800 text-sm bg-slate-50/50 p-5 rounded-xl border border-slate-200">
+                {/* Fila 1: Client + Botó Nou Client */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                  <div className="md:col-span-8 space-y-1">
+                    <label className="text-xs font-bold text-slate-600">Client *</label>
                     <select 
                       value={pressupostActual.clientId || ''}
                       onChange={(e) => seleccioClientHandler(e.target.value)}
                       required
-                      className="font-bold text-sm bg-white border-slate-300 text-slate-900 py-3"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-slate-400 bg-white"
                     >
-                      <option value="">-- Selecciona Client --</option>
+                      <option value="">Selecciona un Client...</option>
                       {clients.map(c => (
                         <option key={c.id} value={c.id}>{c.nom} ({c.cifNif || 'Sense NIF'})</option>
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase">Data d'Emissió</label>
+                  <div className="md:col-span-4">
+                    <button 
+                      type="button" 
+                      onClick={() => alert("Per afegir un client nou, utilitza la secció de Clients a la barra lateral.")}
+                      className="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow-sm"
+                    >
+                      + Nou Client
+                    </button>
+                  </div>
+                </div>
+
+                {/* Fila 2: Data Emissió, Data Venciment, Número i Estat */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-600">Data Pressupost *</label>
                     <input 
                       type="date" 
                       value={pressupostActual.data || ''} 
                       onChange={e => setPressupostActual({ ...pressupostActual, data: e.target.value })}
-                      className="font-semibold text-sm bg-white border-slate-300 py-3 text-slate-900"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 bg-white"
                     />
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase">Validesa Fins a</label>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-600">Validesa Fins a</label>
                     <input 
                       type="date" 
                       value={pressupostActual.validesaFins || ''} 
                       onChange={e => setPressupostActual({ ...pressupostActual, validesaFins: e.target.value })}
-                      className="font-semibold text-sm bg-white border-slate-300 py-3 text-slate-900"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 bg-white"
                     />
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase">Estat del Pressupost</label>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-600">Número Pressupost *</label>
+                    <input 
+                      type="text" 
+                      value={pressupostActual.numero || ''} 
+                      onChange={e => setPressupostActual({ ...pressupostActual, numero: e.target.value })}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-sky-700 bg-white"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-600">Estat del Pressupost</label>
                     <select 
                       value={pressupostActual.estat || 'esborrany'}
                       onChange={e => setPressupostActual({ ...pressupostActual, estat: e.target.value as EstatPressupost })}
-                      className="font-extrabold text-sm bg-white border-slate-300 text-sky-700 py-3"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-extrabold text-sky-700 bg-white"
                     >
                       <option value="esborrany">📝 Esborrany</option>
                       <option value="enviat">📩 Enviat al client</option>
@@ -524,29 +541,28 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                     </select>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 pt-2 border-t border-slate-200/80">
+
+                {/* Fila 3: Opció Imatges PDF */}
+                <div className="flex items-center gap-3 pt-1">
                   <input 
                     type="checkbox" 
                     id="incloureImatges" 
                     checked={pressupostActual.incloureImatgesPDF ?? true}
                     onChange={e => setPressupostActual({ ...pressupostActual, incloureImatgesPDF: e.target.checked })}
-                    className="w-5 h-5 accent-sky-600 rounded cursor-pointer"
+                    className="w-4 h-4 accent-slate-800 rounded cursor-pointer"
                   />
-                  <label htmlFor="incloureImatges" className="cursor-pointer text-sm font-semibold text-slate-800 mb-0">
+                  <label htmlFor="incloureImatges" className="cursor-pointer text-xs font-semibold text-slate-700">
                     Incloure imatges i fotografies dels articles en el PDF generat
                   </label>
                 </div>
               </div>
 
-              {/* SECTORS I ARTICLES */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">2. Desglossament per Sectors de Treball</h4>
-                    <p className="text-sm font-extrabold text-slate-800 mt-0.5">Afegeix sectors per agrupar la informació a la factura/pressupost.</p>
-                  </div>
-                  <button type="button" onClick={afegirSector} className="btn btn-secondary font-bold border-sky-300 text-sky-700 bg-sky-50 hover:bg-sky-100">
-                    <FolderPlus size={18} /> Afegir Nou Sector
+              {/* 2. SECTORS I LÍNEES DE DETALL */}
+              <div className="space-y-6 pt-2">
+                <div className="flex items-center justify-between border-b border-slate-300 pb-2">
+                  <h4 className="text-lg font-extrabold text-slate-800">Línies de Detall per Sectors</h4>
+                  <button type="button" onClick={afegirSector} className="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
+                    <FolderPlus size={16} /> + Afegir Nou Sector
                   </button>
                 </div>
 
@@ -555,11 +571,11 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                   const theme = SECTOR_THEMES[secIdx % SECTOR_THEMES.length];
 
                   return (
-                    <div key={sec.id} className={`card p-6 space-y-5 border-2 border-l-8 ${theme.border} ${theme.bg} shadow-md rounded-2xl`}>
-                      {/* Encapçalament del Sector amb Color de Distinció */}
-                      <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border ${theme.headerBg} shadow-sm`}>
+                    <div key={sec.id} className={`p-5 space-y-4 border-2 border-l-8 ${theme.border} ${theme.bg} shadow-sm rounded-xl`}>
+                      {/* Encapçalament del Sector */}
+                      <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-lg border ${theme.headerBg}`}>
                         <div className="flex items-center gap-3 flex-1 w-full sm:w-auto">
-                          <span className={`font-black text-xs px-3.5 py-1.5 rounded-lg ${theme.tagBg} uppercase tracking-wider shrink-0 shadow-sm`}>
+                          <span className={`font-black text-xs px-3 py-1 rounded ${theme.tagBg} uppercase tracking-wider shrink-0`}>
                             Sector {secIdx + 1}
                           </span>
                           <input 
@@ -572,12 +588,12 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                 sectors: prev.sectors?.map(s => s.id === sec.id ? { ...s, nom: nomNou } : s)
                               }));
                             }}
-                            className={`font-extrabold text-lg bg-white border border-slate-300 focus:border-sky-500 rounded-lg px-3.5 py-1.5 ${theme.titleText} w-full shadow-sm`}
+                            className={`font-bold text-base bg-white border border-slate-300 focus:border-slate-500 rounded-lg px-3 py-1 ${theme.titleText} w-full`}
                             placeholder="Nom del Sector (ex: Demolicions i Neteja)"
                           />
                         </div>
                         <div className="flex flex-wrap items-center gap-2 shrink-0">
-                          {/* Seleccionador d'articles ràpid */}
+                          {/* Seleccionador d'articles ràpid del catàleg */}
                           <select 
                             onChange={(e) => {
                               if (e.target.value) {
@@ -586,25 +602,17 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                 e.target.value = '';
                               }
                             }}
-                            className="text-xs font-extrabold py-2 px-3 bg-white border-slate-300 text-slate-800 shadow-sm"
+                            className="text-xs font-bold py-1.5 px-3 bg-white border border-slate-300 text-slate-800 rounded-lg"
                           >
-                            <option value="">+ Carregar des del Catàleg</option>
+                            <option value="">+ Carregar del Catàleg</option>
                             {articles.map(a => (
                               <option key={a.id} value={a.id}>{a.nom} ({formatEuro(a.preuUnitari)})</option>
                             ))}
                           </select>
                           <button 
                             type="button" 
-                            onClick={() => afegirLiniaASector(sec.id)}
-                            className="btn btn-secondary btn-sm text-xs font-bold bg-white border-slate-300 shadow-sm"
-                            title="Afegir línia manual"
-                          >
-                            + Línia Personalitzada
-                          </button>
-                          <button 
-                            type="button" 
                             onClick={() => eliminarSector(sec.id)}
-                            className="btn btn-secondary btn-icon btn-sm text-rose-600 hover:bg-rose-50 border-rose-200 bg-white shadow-sm"
+                            className="text-rose-600 hover:text-rose-800 p-1.5 rounded-lg hover:bg-rose-50 border border-rose-200 bg-white"
                             title="Eliminar sector"
                           >
                             <Trash2 size={16} />
@@ -612,100 +620,90 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                         </div>
                       </div>
 
-                      {/* Llista organitzada d'articles d'aquest sector en UNA SOLA LÍNIA */}
-                      {liniesSector.length === 0 ? (
-                        <div className="text-center py-8 text-sm text-slate-500 italic border-2 border-dashed border-slate-200 rounded-xl bg-white">
-                          Cap article afegit a aquest sector. Fes clic a "+ Carregar des del Catàleg" o "+ Línia Personalitzada".
-                        </div>
-                      ) : (
-                        <div className="space-y-3 overflow-x-auto pb-2">
-                          {/* Capçalera de Columnes per a Línies */}
-                          <div className="flex items-center gap-3 px-4 py-2.5 bg-white/80 rounded-xl border border-slate-200 text-xs font-black uppercase text-slate-600 tracking-wider min-w-[1050px] shadow-sm">
-                            <div className="w-[220px] shrink-0">Codi / Concepte</div>
-                            <div className="flex-1 min-w-[260px]">Descripció Tècnica</div>
-                            <div className="w-28 text-center shrink-0">Quantitat</div>
-                            <div className="w-36 text-right shrink-0">Preu U. (€)</div>
-                            <div className="w-24 text-right shrink-0">Desc. %</div>
-                            <div className="w-24 text-center shrink-0">Tipus IVA</div>
-                            <div className="w-36 text-right shrink-0">Subtotal (€)</div>
-                            <div className="w-10 text-center shrink-0"></div>
+                      {/* Taula Visual de Línies exactament com la imatge de FacturasCLOUD */}
+                      <div className="space-y-2 overflow-x-auto pt-1 pb-1">
+                        {/* Fila de Capçaleres amb Línia d'Enquadrament */}
+                        <div className="flex items-center gap-2 px-1 text-xs font-bold text-slate-700 min-w-[920px] border-b border-slate-300 pb-1">
+                          <div className="w-8 text-center text-amber-500">
+                            <span className="text-base font-extrabold">↕</span>
                           </div>
+                          <div className="flex-1 min-w-[320px] px-2 text-left">Descripció</div>
+                          <div className="w-28 text-center px-2">Quantitat</div>
+                          <div className="w-32 text-right px-2">Preu (€)</div>
+                          <div className="w-20 text-right px-2">Desc %</div>
+                          <div className="w-24 text-center px-2">IVA %</div>
+                          <div className="w-36 text-right px-2">Subtotal</div>
+                          <div className="w-8 text-center"></div>
+                        </div>
 
-                          {/* Línies en una sola línia horitzontal */}
-                          {liniesSector.map((l, indexLinia) => {
+                        {/* Registres de línia */}
+                        {liniesSector.length === 0 ? (
+                          <div className="text-center py-6 text-sm text-slate-400 italic bg-white border border-slate-200 rounded-lg">
+                            Sense línies en aquest sector. Fes clic a "Insertar Fila (F8)" a baix.
+                          </div>
+                        ) : (
+                          liniesSector.map((l) => {
                             const base = l.preuUnitari * l.quantitat;
                             const desc = (base * (l.descomptePercent || 0)) / 100;
                             const subtotalLinia = base - desc;
 
                             return (
-                              <div key={l.id} className={`flex items-center gap-3 p-3 rounded-2xl border-2 border-slate-200 bg-white shadow-sm ${theme.hoverBorder} transition-all min-w-[1050px]`}>
-                                {/* 1. Codi / Nom de l'Article */}
-                                <div className="w-[220px] shrink-0">
+                              <div key={l.id} className="flex items-center gap-2 min-w-[920px]">
+                                {/* Icona reordenar ↕ */}
+                                <div className="w-8 text-center text-amber-500 cursor-grab font-black text-lg">
+                                  ↕
+                                </div>
+
+                                {/* Campo Descripció (Super Ample) */}
+                                <div className="flex-1 min-w-[320px]">
                                   <input 
                                     type="text" 
                                     value={l.nom} 
                                     onChange={e => actualitzarLinia(l.id, 'nom', e.target.value)}
-                                    placeholder="Nom / Codi..."
-                                    className="font-extrabold text-sm text-slate-900 border-slate-300 focus:border-sky-500 py-2.5 px-3 rounded-xl w-full"
-                                    title={`Línia #${indexLinia + 1} - Codi/Nom`}
+                                    placeholder="Escriu la descripció del concepte o servei..."
+                                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-900 focus:ring-2 focus:ring-slate-400 bg-white"
                                   />
                                 </div>
 
-                                {/* 2. Descripció Tècnica (En una sola línia ampla) */}
-                                <div className="flex-1 min-w-[260px]">
-                                  <input 
-                                    type="text" 
-                                    value={l.descripcio || ''} 
-                                    onChange={e => actualitzarLinia(l.id, 'descripcio', e.target.value)}
-                                    placeholder="Descripció tècnica addicional..."
-                                    className="text-xs font-semibold text-slate-700 border-slate-300 focus:border-sky-500 py-2.5 px-3 rounded-xl w-full bg-slate-50/50"
-                                    title="Descripció Tècnica"
-                                  />
-                                </div>
-
-                                {/* 3. Quantitat */}
-                                <div className="w-28 shrink-0">
+                                {/* Quantitat */}
+                                <div className="w-28">
                                   <input 
                                     type="number" 
                                     step="any" 
                                     value={l.quantitat} 
                                     onChange={e => actualitzarLinia(l.id, 'quantitat', parseFloat(e.target.value) || 0)}
-                                    className={`text-center font-black text-base py-2 px-2 ${theme.qtyBg} border-2 focus:bg-white rounded-xl shadow-inner w-full`}
-                                    title="Quantitat"
+                                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-center font-bold text-slate-900 bg-white"
                                   />
                                 </div>
 
-                                {/* 4. Preu Unitari (€) */}
-                                <div className="w-36 shrink-0">
+                                {/* Preu (€) */}
+                                <div className="w-32">
                                   <input 
                                     type="number" 
                                     step="0.01" 
                                     value={l.preuUnitari} 
                                     onChange={e => actualitzarLinia(l.id, 'preuUnitari', parseFloat(e.target.value) || 0)}
-                                    className="text-right font-extrabold text-sm py-2 px-3 border-2 border-slate-300 focus:border-sky-500 rounded-xl w-full text-slate-900"
-                                    title="Preu Unitari"
+                                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-right font-bold text-slate-900 bg-white"
                                   />
                                 </div>
 
-                                {/* 5. Descompte (%) */}
-                                <div className="w-24 shrink-0">
+                                {/* Descompte % */}
+                                <div className="w-20">
                                   <input 
                                     type="number" 
                                     step="1" 
-                                    value={l.descomptePercent} 
+                                    value={l.descomptePercent || 0} 
                                     onChange={e => actualitzarLinia(l.id, 'descomptePercent', parseFloat(e.target.value) || 0)}
-                                    className="text-right font-bold text-xs py-2 px-2 border border-slate-300 rounded-xl w-full text-slate-900"
-                                    title="Descompte %"
+                                    className="w-full border border-slate-300 rounded-lg px-2 py-2 text-sm text-right text-slate-800 bg-white"
                                   />
                                 </div>
 
-                                {/* 6. Tipus IVA */}
-                                <div className="w-24 shrink-0">
+                                {/* IVA % */}
+                                <div className="w-24">
                                   <select 
                                     value={l.ivaPercent}
                                     onChange={e => actualitzarLinia(l.id, 'ivaPercent', Number(e.target.value))}
-                                    className="text-center font-extrabold text-xs py-2 px-2 border border-slate-300 rounded-xl w-full bg-white text-slate-900"
-                                    title="IVA"
+                                    className="w-full border border-slate-300 rounded-lg px-1 py-2 text-sm text-center font-semibold text-slate-800 bg-white"
                                   >
                                     <option value={21}>21%</option>
                                     <option value={10}>10%</option>
@@ -714,64 +712,77 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
                                   </select>
                                 </div>
 
-                                {/* 7. Subtotal Línia (€) */}
-                                <div className={`w-36 shrink-0 text-right px-3 py-1.5 rounded-xl border ${theme.subtotalBg} shadow-sm`}>
-                                  <span className="text-[9px] font-black uppercase tracking-wider block opacity-90">Subtotal</span>
-                                  <span className="text-sm font-black block mt-0.5">{formatEuro(subtotalLinia)}</span>
+                                {/* Subtotal (Lectura en fons gris nítid) */}
+                                <div className="w-36 bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-sm font-extrabold text-right text-slate-900">
+                                  {formatEuro(subtotalLinia)}
                                 </div>
 
-                                {/* 8. Acció Eliminar */}
-                                <button 
-                                  type="button" 
-                                  onClick={() => eliminarLinia(l.id)}
-                                  className="text-rose-500 hover:text-rose-700 p-2 rounded-xl hover:bg-rose-50 border border-slate-200 shrink-0 transition-colors"
-                                  title="Eliminar línia"
-                                >
-                                  <Trash2 size={18} />
-                                </button>
+                                {/* Botó X d'Eliminar Línia (Cercle vermell/taronja com la imatge) */}
+                                <div className="w-8 flex justify-center">
+                                  <button 
+                                    type="button" 
+                                    onClick={() => eliminarLinia(l.id)}
+                                    className="w-6 h-6 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold flex items-center justify-center text-xs shadow-sm transition-transform active:scale-95"
+                                    title="Eliminar fila"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
                               </div>
                             );
-                          })}
-                        </div>
-                      )}
+                          })
+                        )}
+                      </div>
+
+                      {/* Botó Inferior Esquerra "Insertar Fila (F8)" com la imatge */}
+                      <div className="pt-1">
+                        <button 
+                          type="button" 
+                          onClick={() => afegirLiniaASector(sec.id)} 
+                          className="bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs px-4 py-2 rounded-lg shadow-md flex items-center gap-1.5"
+                        >
+                          Insertar Fila (F8)
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
               </div>
 
-              {/* Notes i Totals Finals */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                <div>
-                  <label className="text-xs font-bold text-slate-700 uppercase">Condicions Generals & Notes per al Client</label>
+              {/* 3. RESUM I TOTALS FINALS */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-200">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-600">Notes i Condicions del Pressupost</label>
                   <textarea 
-                    rows={4} 
+                    rows={3} 
                     value={pressupostActual.notes || ''} 
                     onChange={e => setPressupostActual({ ...pressupostActual, notes: e.target.value })}
-                    placeholder="Escriu les condicions de pagament, termini d'execució, validesa de l'oferta..."
-                    className="bg-white border-slate-300 text-sm mt-1"
+                    placeholder="Escriu les condicions d'acceptació, terminis d'execució..."
+                    className="w-full border border-slate-300 rounded-lg p-3 text-sm text-slate-800 bg-white"
                   />
                 </div>
-                <div className="space-y-4 justify-self-end w-full max-w-sm text-sm bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                  <div className="flex justify-between text-slate-600 font-medium">
+                <div className="bg-slate-50 p-5 rounded-xl border border-slate-300 space-y-2.5 text-sm">
+                  <div className="flex justify-between font-semibold text-slate-700">
                     <span>Base Imponible Totals:</span>
                     <span className="font-bold text-slate-900">{formatEuro(pressupostActual.subtotal || 0)}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600 font-medium">
+                  <div className="flex justify-between font-semibold text-slate-700">
                     <span>Quota d'IVA Total:</span>
                     <span className="font-bold text-slate-900">{formatEuro(pressupostActual.totalIva || 0)}</span>
                   </div>
-                  <div className="border-t-2 border-slate-200 pt-3 flex justify-between font-extrabold text-xl">
-                    <span className="text-slate-900">TOTAL PRESSUPOST:</span>
-                    <span className="text-sky-600">{formatEuro(pressupostActual.total || 0)}</span>
+                  <div className="border-t border-slate-300 pt-2 flex justify-between font-black text-xl text-slate-900">
+                    <span>TOTAL PRESSUPOST:</span>
+                    <span className="text-sky-700">{formatEuro(pressupostActual.total || 0)}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end items-center gap-4 pt-4 border-t border-slate-200">
-                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary font-bold px-6 py-3">
-                  Descartar Canvis
+              {/* Botons d'Acció al Peu */}
+              <div className="flex justify-end items-center gap-3 pt-4 border-t border-slate-200">
+                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary font-bold px-5 py-2.5">
+                  Descartar
                 </button>
-                <button type="submit" className="btn btn-primary font-extrabold px-8 py-3 text-base shadow-lg">
+                <button type="submit" className="bg-slate-800 hover:bg-slate-900 text-white font-extrabold px-7 py-2.5 rounded-lg shadow-lg text-base">
                   Guardar Pressupost
                 </button>
               </div>
