@@ -168,30 +168,30 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[var(--bg-app)] text-[var(--text-main)] transition-colors">
-      {/* Sidebar Col·lapsable Lateral PHC */}
-      <Sidebar 
+    <div className="min-h-screen flex flex-col bg-[#c5d8ef] text-slate-900 font-sans antialiased overflow-x-hidden select-none">
+      {/* 1. Barra Superior Completa PHC Advanced 2009 (Titlebar + Menus + Iconbar + Logo Watermark) */}
+      <Topbar 
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        collapsed={sidebarCollapsed}
-        setCollapsed={setSidebarCollapsed}
+        theme={theme}
+        toggleTheme={toggleTheme}
         empresa={empresa}
+        onOpenLookup={type => setLookupType(type)}
       />
 
-      {/* Àrea de Contingut Principal amb offset dinàmic de Sidebar */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'pl-16' : 'pl-64'}`}>
-        {/* Topbar Persistent de Comanda */}
-        <Topbar 
+      {/* 2. Àrea Central (Painel Navegador Esquerre + Espai de Treball Central PHC) */}
+      <div className="flex-1 flex min-h-0 overflow-hidden">
+        {/* Painel Navegador Esquerre (Pocket / Indicadores / Monitores) */}
+        <Sidebar 
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          theme={theme}
-          toggleTheme={toggleTheme}
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
           empresa={empresa}
-          onOpenLookup={type => setLookupType(type)}
         />
 
-        {/* Panell de Contingut de Mòdul */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-6 overflow-y-auto max-w-full">
+        {/* Panell de Contingut de Mòdul Central */}
+        <main className="flex-1 p-3 lg:p-4 overflow-y-auto max-w-full bg-[#d8e5f5]">
           {activeTab === 'dashboard' && (
             <Dashboard 
               pressupostos={pressupostos}
@@ -251,14 +251,26 @@ export function App() {
             />
           )}
         </main>
-
-        <footer className="py-3 px-6 border-t border-[var(--border)] bg-slate-900 text-slate-400 text-xs flex justify-between items-center">
-          <p>© {new Date().getFullYear()} {empresa.nom} — Sistema de Gestió Empresarial PHC Enterprise</p>
-          <span className="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-            Exercício 2026 / AD
-          </span>
-        </footer>
       </div>
+
+      {/* 3. Barra d'Estat Inferior Clàssica de PHC Advanced (Software PHC / Administrador / Empresa) */}
+      <footer className="h-6 bg-[#ece9d8] border-t border-[#b2b0a6] text-slate-800 text-[11px] font-semibold px-3 flex items-center justify-between shrink-0 shadow-inner">
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1 text-blue-900 font-extrabold">
+            <span className="w-2 h-2 rounded-full bg-blue-600"></span> Software PHC Advanced
+          </span>
+          <span className="text-slate-400">|</span>
+          <span>👤 Administrador de Sistema</span>
+          <span className="text-slate-400">|</span>
+          <span>📁 {empresa.nom}_2026</span>
+          <span className="text-slate-400">|</span>
+          <span>🏢 {empresa.nom}, Lda</span>
+        </div>
+        <div className="flex items-center gap-3 text-[10px] text-slate-600 font-mono">
+          <span>ℹ️ Exercício Fiscal 2026</span>
+          <span>• Andorra AD</span>
+        </div>
+      </footer>
 
       {/* Modal Popup Lookup si està actiu */}
       {lookupType && (
