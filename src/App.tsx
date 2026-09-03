@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
+import { Topbar } from './components/Topbar';
 import { Dashboard } from './components/Dashboard';
 import { ClientManager } from './components/ClientManager';
 import { ArticleManager } from './components/ArticleManager';
 import { QuoteManager } from './components/QuoteManager';
 import { InvoiceManager } from './components/InvoiceManager';
 import { CompanySettings } from './components/CompanySettings';
+import { QuickLookupModal } from './components/QuickLookupModal';
 
 import { storageService } from './services/storageService';
 import type { Empresa, Client, Article, Pressupost, Factura } from './types';
@@ -13,6 +15,8 @@ import type { Empresa, Client, Article, Pressupost, Factura } from './types';
 export function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [theme, setTheme] = useState<'dark' | 'light'>(storageService.getTheme());
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [lookupType, setLookupType] = useState<'articles' | 'clients' | null>(null);
 
   const [empresa, setEmpresa] = useState<Empresa>(storageService.getEmpresa());
   const [clients, setClients] = useState<Client[]>(storageService.getClients());
@@ -131,7 +135,6 @@ export function App() {
     setFactures(novesFactures);
     storageService.saveFactures(novesFactures);
 
-    // Actualitzem l'estat del pressupost a "acceptat"
     const pressupostActualitzat: Pressupost = { ...pressupost, estat: 'acceptat' };
     handleSavePressupost(pressupostActualitzat);
 
@@ -165,79 +168,107 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-app)] text-[var(--text-main)] transition-colors">
-      <Navbar 
+    <div className="min-h-screen flex bg-[var(--bg-app)] text-[var(--text-main)] transition-colors">
+      {/* Sidebar Col·lapsable Lateral PHC */}
+      <Sidebar 
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        theme={theme}
-        toggleTheme={toggleTheme}
+        collapsed={sidebarCollapsed}
+        setCollapsed={setSidebarCollapsed}
         empresa={empresa}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-        {activeTab === 'dashboard' && (
-          <Dashboard 
-            pressupostos={pressupostos}
-            factures={factures}
-            clients={clients}
-            articles={articles}
-            setActiveTab={setActiveTab}
-            onCrearPressupost={() => setActiveTab('pressupostos')}
-            onCrearFactura={() => setActiveTab('factures')}
-          />
-        )}
+      {/* Àrea de Contingut Principal amb offset dinàmic de Sidebar */}
+      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'pl-16' : 'pl-64'}`}>
+        {/* Topbar Persistent de Comanda */}
+        <Topbar 
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          theme={theme}
+          toggleTheme={toggleTheme}
+          empresa={empresa}
+          onOpenLookup={type => setLookupType(type)}
+        />
 
-        {activeTab === 'pressupostos' && (
-          <QuoteManager 
-            pressupostos={pressupostos}
-            clients={clients}
-            articles={articles}
-            empresa={empresa}
-            onSavePressupost={handleSavePressupost}
-            onDeletePressupost={handleDeletePressupost}
-            onConvertToFactura={handleConvertToFactura}
-          />
-        )}
+        {/* Panell de Contingut de Mòdul */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-6 overflow-y-auto max-w-full">
+          {activeTab === 'dashboard' && (
+            <Dashboard 
+              pressupostos={pressupostos}
+              factures={factures}
+              clients={clients}
+              articles={articles}
+              setActiveTab={setActiveTab}
+              onCrearPressupost={() => setActiveTab('pressupostos')}
+              onCrearFactura={() => setActiveTab('factures')}
+            />
+          )}
 
-        {activeTab === 'factures' && (
-          <InvoiceManager 
-            factures={factures}
-            clients={clients}
-            articles={articles}
-            empresa={empresa}
-            onSaveFactura={handleSaveFactura}
-            onDeleteFactura={handleDeleteFactura}
-          />
-        )}
+          {activeTab === 'pressupostos' && (
+            <QuoteManager 
+              pressupostos={pressupostos}
+              clients={clients}
+              articles={articles}
+              empresa={empresa}
+              onSavePressupost={handleSavePressupost}
+              onDeletePressupost={handleDeletePressupost}
+              onConvertToFactura={handleConvertToFactura}
+            />
+          )}
 
-        {activeTab === 'articles' && (
-          <ArticleManager 
-            articles={articles}
-            onSaveArticle={handleSaveArticle}
-            onDeleteArticle={handleDeleteArticle}
-          />
-        )}
+          {activeTab === 'factures' && (
+            <InvoiceManager 
+              factures={factures}
+              clients={clients}
+              articles={articles}
+              empresa={empresa}
+              onSaveFactura={handleSaveFactura}
+              onDeleteFactura={handleDeleteFactura}
+            />
+          )}
 
-        {activeTab === 'clients' && (
-          <ClientManager 
-            clients={clients}
-            onSaveClient={handleSaveClient}
-            onDeleteClient={handleDeleteClient}
-          />
-        )}
+          {activeTab === 'articles' && (
+            <ArticleManager 
+              articles={articles}
+              onSaveArticle={handleSaveArticle}
+              onDeleteArticle={handleDeleteArticle}
+            />
+          )}
 
-        {activeTab === 'configuracio' && (
-          <CompanySettings 
-            empresa={empresa}
-            onSaveEmpresa={handleSaveEmpresa}
-            onReloadAllData={recarregarDades}
-          />
-        )}
-      </main>
+          {activeTab === 'clients' && (
+            <ClientManager 
+              clients={clients}
+              onSaveClient={handleSaveClient}
+              onDeleteClient={handleDeleteClient}
+            />
+          )}
 
-      <footer className="py-6 border-t border-[var(--border)] text-center text-xs text-[var(--text-muted)]">
-        <p>© {new Date().getFullYear()} {empresa.nom} — Aplicació Web Privada en Català</p>
-      </footer>
+          {activeTab === 'configuracio' && (
+            <CompanySettings 
+              empresa={empresa}
+              onSaveEmpresa={handleSaveEmpresa}
+              onReloadAllData={recarregarDades}
+            />
+          )}
+        </main>
+
+        <footer className="py-3 px-6 border-t border-[var(--border)] bg-slate-900 text-slate-400 text-xs flex justify-between items-center">
+          <p>© {new Date().getFullYear()} {empresa.nom} — Sistema de Gestió Empresarial PHC Enterprise</p>
+          <span className="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+            Exercício 2026 / AD
+          </span>
+        </footer>
+      </div>
+
+      {/* Modal Popup Lookup si està actiu */}
+      {lookupType && (
+        <QuickLookupModal 
+          type={lookupType}
+          articles={articles}
+          clients={clients}
+          onClose={() => setLookupType(null)}
+        />
+      )}
     </div>
   );
 }

@@ -315,6 +315,15 @@ tr:hover td {
   width: 96vw !important;
 }
 
+/* PHC Data-Dense & Scrollbar Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Print / PDF Styling */
 @media print {
   @page {

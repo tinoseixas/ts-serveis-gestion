@@ -8,11 +8,18 @@ import {
   Eye, 
   ArrowRightLeft, 
   FolderPlus, 
-  X, 
-  Layers 
+  Layers,
+  SkipBack,
+  ChevronLeft,
+  ChevronRight,
+  SkipForward,
+  Printer,
+  Save,
+  RotateCcw
 } from 'lucide-react';
 import type { Pressupost, Client, Article, Sector, LiniaItem, EstatPressupost, Empresa } from '../types';
 import { PdfPreviewModal } from './PdfPreviewModal';
+import { QuickLookupModal } from './QuickLookupModal';
 
 interface QuoteManagerProps {
   pressupostos: Pressupost[];
@@ -110,8 +117,8 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
   const [estatFiltre, setEstatFiltre] = useState<string>('tots');
   const [modalObert, setModalObert] = useState(false);
   const [pdfModalDoc, setPdfModalDoc] = useState<Pressupost | null>(null);
-
-  // Pressupost en edició
+  const [lookupType, setLookupType] = useState<'articles' | 'clients' | null>(null);
+  const [activeRecordIndex, setActiveRecordIndex] = useState<number>(0);
   const [pressupostActual, setPressupostActual] = useState<Partial<Pressupost>>({});
 
   const pressupostosFiltrats = pressupostos.filter(p => {
@@ -160,8 +167,17 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
   };
 
   const obrirModalEditar = (p: Pressupost) => {
+    const idx = pressupostos.findIndex(item => item.id === p.id);
+    if (idx !== -1) setActiveRecordIndex(idx);
     setPressupostActual(JSON.parse(JSON.stringify(p)));
     setModalObert(true);
+  };
+
+  const carregarRegistrePerIndex = (idx: number) => {
+    if (idx >= 0 && idx < pressupostos.length) {
+      setActiveRecordIndex(idx);
+      setPressupostActual(JSON.parse(JSON.stringify(pressupostos[idx])));
+    }
   };
 
   // Afegir un sector nou
@@ -444,56 +460,132 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
         </div>
       </div>
 
-      {/* Modal d'Edició / Creació de Pressupost en estil FacturasCLOUD */}
+      {/* Modal d'Edició / Creació de Pressupost en estil PHC Enterprise (Header-Detail) */}
       {modalObert && (
         <div className="modal-overlay p-2 sm:p-4">
-          <div className="modal-content modal-content-wide max-w-[96vw] w-[96vw] bg-white rounded-xl shadow-2xl p-6 sm:p-8 space-y-6 animate-fade-in my-auto border border-slate-200">
-            {/* Capçalera amb Pestanya "Informació General" */}
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div className="modal-content modal-content-wide max-w-[96vw] w-[96vw] bg-white rounded-xl shadow-2xl p-5 sm:p-6 space-y-4 animate-fade-in my-auto border border-slate-300 text-slate-900">
+            {/* Barra d'Accions Superior Padronitzada PHC */}
+            <div className="bg-slate-900 text-white p-3 rounded-xl flex flex-wrap items-center justify-between gap-3 shadow-md border border-slate-800">
               <div className="flex items-center gap-2">
-                <div className="bg-slate-800 text-amber-400 font-extrabold text-sm px-5 py-2 rounded-t-lg shadow-sm border-t-2 border-amber-400 flex items-center gap-2">
-                  <FileSpreadsheet size={16} /> Informació General
-                </div>
+                <button 
+                  type="button" 
+                  onClick={obrirModalCrear}
+                  className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow-sm uppercase tracking-wider"
+                  title="Novo Registo"
+                >
+                  <Plus size={14} /> + Novo
+                </button>
+                <button 
+                  type="button" 
+                  onClick={(e) => { e.preventDefault(); guardar(e as any); }} 
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow-sm"
+                  title="Gravar Registo"
+                >
+                  <Save size={14} /> Gravar
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setModalObert(false)} 
+                  className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 border border-slate-700"
+                  title="Cancelar / Sair"
+                >
+                  <RotateCcw size={14} /> Cancelar
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    if (pressupostActual.id) setPdfModalDoc(pressupostActual as Pressupost);
+                  }}
+                  className="bg-sky-700 hover:bg-sky-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 border border-sky-600"
+                  title="Imprimir Documento PDF"
+                >
+                  <Printer size={14} /> Imprimir PDF
+                </button>
               </div>
-              <div className="flex items-center gap-3">
-                <button type="button" onClick={() => setModalObert(false)} className="btn btn-secondary text-slate-600 py-1.5 px-4 text-xs font-bold">
-                  Descartar
+
+              {/* Control de Navegació Sequencial entre Registres (Primeiro, Anterior, Próximo, Último) */}
+              <div className="flex items-center gap-1 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800 text-xs">
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase mr-1">Registo:</span>
+                <button 
+                  type="button" 
+                  onClick={() => carregarRegistrePerIndex(0)} 
+                  disabled={activeRecordIndex <= 0}
+                  className="p-1 rounded hover:bg-slate-800 disabled:opacity-30 text-amber-400"
+                  title="Primeiro Registo"
+                >
+                  <SkipBack size={14} />
                 </button>
-                <button type="button" onClick={(e) => { e.preventDefault(); guardar(e as any); }} className="bg-slate-800 hover:bg-slate-900 text-white font-extrabold px-5 py-1.5 rounded-lg text-xs shadow-md">
-                  Guardar Pressupost
+                <button 
+                  type="button" 
+                  onClick={() => carregarRegistrePerIndex(activeRecordIndex - 1)} 
+                  disabled={activeRecordIndex <= 0}
+                  className="p-1 rounded hover:bg-slate-800 disabled:opacity-30 text-amber-400"
+                  title="Registo Anterior"
+                >
+                  <ChevronLeft size={14} />
                 </button>
-                <button onClick={() => setModalObert(false)} className="text-slate-400 hover:text-slate-600 p-1">
-                  <X size={22} />
+
+                <span className="font-mono text-xs text-white font-bold px-2">
+                  {pressupostos.length > 0 ? `${activeRecordIndex + 1} / ${pressupostos.length}` : 'Novo'}
+                </span>
+
+                <button 
+                  type="button" 
+                  onClick={() => carregarRegistrePerIndex(activeRecordIndex + 1)} 
+                  disabled={activeRecordIndex >= pressupostos.length - 1}
+                  className="p-1 rounded hover:bg-slate-800 disabled:opacity-30 text-amber-400"
+                  title="Próximo Registo"
+                >
+                  <ChevronRight size={14} />
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => carregarRegistrePerIndex(pressupostos.length - 1)} 
+                  disabled={activeRecordIndex >= pressupostos.length - 1}
+                  className="p-1 rounded hover:bg-slate-800 disabled:opacity-30 text-amber-400"
+                  title="Último Registo"
+                >
+                  <SkipForward size={14} />
                 </button>
               </div>
             </div>
 
-            <form onSubmit={guardar} className="space-y-6">
-              {/* 1. SECCIÓ INFORMACIÓ GENERAL */}
-              <div className="space-y-4 text-slate-800 text-sm bg-slate-50/50 p-5 rounded-xl border border-slate-200">
-                {/* Fila 1: Client + Botó Nou Client */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                  <div className="md:col-span-8 space-y-1">
-                    <label className="text-xs font-bold text-slate-600">Client *</label>
-                    <select 
-                      value={pressupostActual.clientId || ''}
-                      onChange={(e) => seleccioClientHandler(e.target.value)}
-                      required
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-slate-400 bg-white"
-                    >
-                      <option value="">Selecciona un Client...</option>
-                      {clients.map(c => (
-                        <option key={c.id} value={c.id}>{c.nom} ({c.cifNif || 'Sense NIF'})</option>
-                      ))}
-                    </select>
+            <form onSubmit={guardar} className="space-y-4">
+              {/* 1. SECCIÓ INFORMACIÓ GENERAL COMPACTA (Header Pattern 2-3 Columnes) */}
+              <div className="space-y-3 text-slate-800 text-xs bg-slate-50 p-4 rounded-xl border border-slate-300">
+                {/* Fila 1: Client + Lookup Client */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                  <div className="md:col-span-9 space-y-1">
+                    <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">Cliente (Receptor) *</label>
+                    <div className="flex gap-2">
+                      <select 
+                        value={pressupostActual.clientId || ''}
+                        onChange={(e) => seleccioClientHandler(e.target.value)}
+                        required
+                        className="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-amber-500 bg-white"
+                      >
+                        <option value="">Seleccione o Cliente da Ficha...</option>
+                        {clients.map(c => (
+                          <option key={c.id} value={c.id}>{c.nom} ({c.cifNif || 'Sem NIF'})</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => setLookupType('clients')}
+                        className="bg-sky-700 hover:bg-sky-600 text-white font-extrabold px-3 py-1.5 rounded-lg shrink-0 flex items-center gap-1"
+                        title="Pesquisa Rápida Lookup por NIF/Nome"
+                      >
+                        <Search size={14} /> Lookup
+                      </button>
+                    </div>
                   </div>
-                  <div className="md:col-span-4">
+                  <div className="md:col-span-3">
                     <button 
                       type="button" 
-                      onClick={() => alert("Per afegir un client nou, utilitza la secció de Clients a la barra lateral.")}
-                      className="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow-sm"
+                      onClick={() => alert("Per afegir un client nou, utilitza el menú de Clients a la barra lateral.")}
+                      className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-1.5 rounded-lg shadow-sm"
                     >
-                      + Nou Client
+                      + Novo Cliente
                     </button>
                   </div>
                 </div>
@@ -798,6 +890,22 @@ export const QuoteManager: React.FC<QuoteManagerProps> = ({
           tipus="pressupost"
           empresa={empresa}
           onClose={() => setPdfModalDoc(null)}
+        />
+      )}
+
+      {/* Modal Popup de Cerca Predictiva Lookup */}
+      {lookupType && (
+        <QuickLookupModal 
+          type={lookupType}
+          articles={articles}
+          clients={clients}
+          onSelectClient={c => seleccioClientHandler(c.id)}
+          onSelectArticle={art => {
+            if (pressupostActual.sectors && pressupostActual.sectors.length > 0) {
+              afegirLiniaASector(pressupostActual.sectors[0].id, art);
+            }
+          }}
+          onClose={() => setLookupType(null)}
         />
       )}
     </div>

@@ -35,6 +35,7 @@ export interface Client {
 export interface Article {
   id: string;
   codi: string;
+  codiBarras?: string;
   nom: string;
   descripcio: string;
   preuUnitari: number;
